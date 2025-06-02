@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Steel Product Weight Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 20px; }
+        .calculator { background: #f5f5f5; padding: 20px; border-radius: 8px; }
+        .input-group { margin: 10px 0; }
+        label { display: inline-block; width: 150px; }
+        input, select { padding: 5px; width: 200px; }
+        #result { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h2>Steel Product Weight Calculator</h2>
+        
+        <div class="input-group">
+            <label>Product Type:</label>
+            <select id="productType" onchange="loadPreset()">
+                <option value="custom">Custom</option>
+                <option value="coil">Coil</option>
+                <option value="sheet">Sheet</option>
+                <option value="slit">Slit Coil</option>
+                <option value="plate">Plate</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Length (mm):</label>
+            <input type="number" id="length" step="0.01">
+        </div>
+
+        <div class="input-group">
+            <label>Width (mm):</label>
+            <input type="number" id="width" step="0.01">
+        </div>
+
+        <div class="input-group">
+            <label>Thickness (mm):</label>
+            <input type="number" id="thickness" step="0.01">
+        </div>
+
+        <div class="input-group">
+            <label>Density:</label>
+            <input type="number" id="density" step="0.001" value="7.85">
+        </div>
+
+        <button onclick="calculate()">Calculate</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const presets = {
+            coil: [1000, 925, 0.47, 8.039],
+            sheet: [2450, 1225, 0.4, 8.039],
+            slit: [50000, 150, 0.3, 8.039],
+            plate: [2450, 1225, 0.4, 7.85]
+        };
+
+        function loadPreset() {
+            const type = document.getElementById('productType').value;
+            if (type !== 'custom') {
+                const [l, w, t, d] = presets[type];
+                document.getElementById('length').value = l;
+                document.getElementById('width').value = w;
+                document.getElementById('thickness').value = t;
+                document.getElementById('density').value = d;
+            }
+        }
+
+        function calculate() {
+            const length = parseFloat(document.getElementById('length').value);
+            const width = parseFloat(document.getElementById('width').value);
+            const thickness = parseFloat(document.getElementById('thickness').value);
+            const density = parseFloat(document.getElementById('density').value);
+
+            if ([length, width, thickness, density].some(isNaN)) {
+                alert("Please fill all fields with valid numbers");
+                return;
+            }
+
+            const kgEach = (length * width * thickness * density) / 1000000;
+            document.getElementById('result').innerHTML = 
+                `Calculated Weight: ${kgEach.toFixed(6)} Kg/each`;
+        }
+    </script>
+</body>
+</html>
