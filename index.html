@@ -1,103 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Coil / Sheet / Plate Calculator</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: Arial, sans-serif; background: #f8f8f8; padding: 20px; }
-    .container { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; max-width: 500px; margin: auto; padding: 24px; }
-    h2 { color: #2e7d32; }
-    label { display: block; margin-top: 10px; }
-    input, select { width: 100%; padding: 6px; margin-top: 2px; margin-bottom: 12px; border-radius: 4px; border: 1px solid #bbb; }
-    button { background: #388e3c; color: #fff; border: none; border-radius: 4px; padding: 10px 16px; font-size: 1rem; cursor: pointer; }
-    .result { background: #e8f5e9; padding: 10px; border-radius: 4px; margin-top: 10px; }
-    .section { margin-bottom: 24px; }
-  </style>
+    <meta charset="UTF-8">
+    <title>Freestock Calculators</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f9fa; margin: 0; padding: 0; }
+        .container { max-width: 700px; margin: 40px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 32px; }
+        h1 { text-align: center; color: #2d3e50; margin-bottom: 30px; }
+        label { display: block; margin: 16px 0 6px; font-weight: 600; }
+        input[type="number"] { width: 100%; padding: 8px; font-size: 1em; border: 1px solid #ccc; border-radius: 4px; }
+        .row { display: flex; gap: 16px; }
+        .col { flex: 1; }
+        .results { background: #f1f3f6; border-radius: 8px; margin-top: 28px; padding: 18px; }
+        .result-item { margin: 10px 0; }
+        .result-label { font-weight: 500; }
+        .tooltip {
+            border-bottom: 1px dotted #888;
+            cursor: help;
+            position: relative;
+        }
+        .tooltip:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            left: 0; top: 24px;
+            background: #222; color: #fff; font-size: 0.95em;
+            padding: 6px 10px; border-radius: 6px; white-space: pre;
+            z-index: 10;
+        }
+        @media (max-width: 600px) {
+            .row { flex-direction: column; }
+        }
+        button {
+            background: #2d7ff9; color: #fff; border: none; padding: 10px 24px;
+            border-radius: 5px; font-size: 1em; cursor: pointer; margin-top: 20px;
+        }
+        button:hover { background: #1b5fc6; }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Coil / Sheet / Plate Calculator</h2>
-    
-    <div class="section">
-      <h3>1️⃣ Weight Calculator (Kg/each)</h3>
-      <label>Length (mm): <input type="number" id="length" value="1000"></label>
-      <label>Width (mm): <input type="number" id="width" value="925"></label>
-      <label>Thickness (mm): <input type="number" id="thick" value="0.47"></label>
-      <label>Density (g/cm³): 
-        <select id="density">
-          <option value="8.039">8.039 (Stainless Steel)</option>
-          <option value="7.85">7.85 (Mild Steel)</option>
-        </select>
-      </label>
-      <button onclick="calcWeight()">Calculate Weight</button>
-      <div class="result" id="weightResult"></div>
-    </div>
-    
-    <div class="section">
-      <h3>2️⃣ Price Conversion</h3>
-      <label>Width (mm): <input type="number" id="pWidth" value="925"></label>
-      <label>Thickness (mm): <input type="number" id="pThick" value="0.47"></label>
-      <label>Density (g/cm³): 
-        <select id="pDensity">
-          <option value="8.039">8.039 (Stainless Steel)</option>
-          <option value="7.85">7.85 (Mild Steel)</option>
-        </select>
-      </label>
-      <label>R/ton: <input type="number" id="rPerTon" value="16500"></label>
-      <button onclick="calcRpm()">Calculate R/m</button>
-      <div class="result" id="rpmResult"></div>
-      
-      <label>R/m: <input type="number" id="rPerMeter"></label>
-      <button onclick="calcRpt()">Calculate R/ton</button>
-      <div class="result" id="rptResult"></div>
-    </div>
-  </div>
-  
-  <script>
-    // 1. Weight Calculation
-    function calcWeight() {
-      const l = parseFloat(document.getElementById('length').value);
-      const w = parseFloat(document.getElementById('width').value);
-      const t = parseFloat(document.getElementById('thick').value);
-      const d = parseFloat(document.getElementById('density').value);
-      if (isNaN(l) || isNaN(w) || isNaN(t) || isNaN(d)) {
-        document.getElementById('weightResult').innerHTML = "Please fill all fields.";
-        return;
-      }
-      const kg = (l * w * t * d) / 1000000;
-      document.getElementById('weightResult').innerHTML = `Weight: <b>${kg.toFixed(4)} kg</b>`;
-    }
+    <div class="container">
+        <h1>Freestock Calculators</h1>
+        <form id="calcForm" autocomplete="off">
+            <div class="row">
+                <div class="col">
+                    <label for="width">Coil Width (mm)</label>
+                    <input type="number" id="width" value="925" min="1" step="0.01" required>
 
-    // 2. R/ton to R/m
-    function calcRpm() {
-      const w = parseFloat(document.getElementById('pWidth').value);
-      const t = parseFloat(document.getElementById('pThick').value);
-      const d = parseFloat(document.getElementById('pDensity').value);
-      const rton = parseFloat(document.getElementById('rPerTon').value);
-      if (isNaN(w) || isNaN(t) || isNaN(d) || isNaN(rton)) {
-        document.getElementById('rpmResult').innerHTML = "Please fill all fields.";
-        return;
-      }
-      const kgpm = (w * t * d) / 1000;
-      const rpm = (kgpm / 1000) * rton;
-      document.getElementById('rpmResult').innerHTML = `R/m: <b>R${rpm.toFixed(2)}</b> (Kg/m = ${kgpm.toFixed(4)})`;
-    }
+                    <label for="thickness">Thickness (mm)</label>
+                    <input type="number" id="thickness" value="0.25" min="0.01" step="0.01" required>
 
-    // 3. R/m to R/ton
-    function calcRpt() {
-      const w = parseFloat(document.getElementById('pWidth').value);
-      const t = parseFloat(document.getElementById('pThick').value);
-      const d = parseFloat(document.getElementById('pDensity').value);
-      const rpm = parseFloat(document.getElementById('rPerMeter').value);
-      if (isNaN(w) || isNaN(t) || isNaN(d) || isNaN(rpm)) {
-        document.getElementById('rptResult').innerHTML = "Please fill all fields.";
-        return;
-      }
-      const kgpm = (w * t * d) / 1000;
-      const rton = (rpm * 1000) / kgpm;
-      document.getElementById('rptResult').innerHTML = `R/ton: <b>R${rton.toFixed(2)}</b> (Kg/m = ${kgpm.toFixed(4)})`;
-    }
-  </script>
-</body>
-</html>
+                    <label for="length">Length (mm)</label>
+                    <input type="number" id="length" value="537.92" min="1" step="0.01" required>
+
+                    <label for="density">Density (g/cm³)
+                        <span class="tooltip" data-tip="Usually 7.85 for steel, 8.039 in your sheet">?</span>
+                    </label>
+                    <input type="number" id="density" value="8.039" min="1" step="0.001" required>
+                </div>
+                <div class="col">
+                    <label for="pricePerKg">Price per kg (R)</label>
+                    <input type="number" id="pricePerKg" value="20" min="0.01" step="0.01" required>
+
+                    <label for="desiredGP">Desired Gross Profit (%)</label>
+                    <input type="number" id="desiredGP" value="20" min="0" max="100" step="0.01" required>
+
+                    <label for="weightEach">Weight Each (kg)</label>
+                    <input type="number" id="weightEach" value="4.662" min="0.01" step="0.001" required>
+                </div>
+            </div>
+            <button type="submit">Calculate</button>
+        </form>
+
+        <div class="results" id="results" style="display:none;">
+            <h2>Results</h2>
+            <div class="result-item"><span class="result-label">kg/m:</span> <span id="kgPerM"></span></div>
+            <div class="result-item"><span class="result-label">Total meters:</span> <span id="totalMeters"></span></div>
+            <div class="result-item"><span class="result-label">Total kg:</span> <span id="totalKg"></span></div>
+            <div class="result-item"><span class="result-label">Cost per meter (R):</span> <span id="costPerM"></span></div>
+            <div class="result-item"><span class="result-label">Cost per ton (R):</span> <span id="costPerTon"></span></div>
+            <div class="result-item"><span class="result-label">Selling price per meter (R):</span> <span id="sellingPerM"></span></div>
