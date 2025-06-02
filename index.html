@@ -2,89 +2,128 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Steel Product Weight Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metal Calculator</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 20px; }
-        .calculator { background: #f5f5f5; padding: 20px; border-radius: 8px; }
-        .input-group { margin: 10px 0; }
-        label { display: inline-block; width: 150px; }
-        input, select { padding: 5px; width: 200px; }
-        #result { margin-top: 20px; font-weight: bold; }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .calculator-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e8f5e9;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
-    <div class="calculator">
-        <h2>Steel Product Weight Calculator</h2>
-        
+    <div class="calculator-section">
+        <h2>Weight Calculator</h2>
         <div class="input-group">
-            <label>Product Type:</label>
-            <select id="productType" onchange="loadPreset()">
-                <option value="custom">Custom</option>
-                <option value="coil">Coil</option>
-                <option value="sheet">Sheet</option>
-                <option value="slit">Slit Coil</option>
-                <option value="plate">Plate</option>
-            </select>
+            <label>Length (mm): <input type="number" id="length"></label>
+            <label>Width (mm): <input type="number" id="width"></label>
+            <label>Thickness (mm): <input type="number" id="thickness"></label>
+            <label>Density (g/cm³): <input type="number" id="density" value="7.85"></label>
+            <button onclick="calculateWeight()">Calculate Weight</button>
+            <div class="result" id="weightResult"></div>
+        </div>
+    </div>
+
+    <div class="calculator-section">
+        <h2>Price Conversions</h2>
+        <div class="input-group">
+            <label>Width (mm): <input type="number" id="priceWidth"></label>
+            <label>Thickness (mm): <input type="number" id="priceThickness"></label>
+            <label>Density (g/cm³): <input type="number" id="priceDensity" value="7.85"></label>
+            <label>R/ton: <input type="number" id="randPerTon"></label>
+            <button onclick="calculatePricePerMeter()">Calculate R/m</button>
+            <div class="result" id="pricePerMeter"></div>
         </div>
 
         <div class="input-group">
-            <label>Length (mm):</label>  
-            <input type="number" id="length" step="0.01">
+            <label>R/m: <input type="number" id="randPerMeter"></label>
+            <button onclick="calculatePricePerTon()">Calculate R/ton</button>
+            <div class="result" id="pricePerTon"></div>
         </div>
-
-        <div class="input-group">
-            <label>Width (mm):</label>
-            <input type="number" id="width" step="0.01">
-        </div>
-
-        <div class="input-group">
-            <label>Thickness (mm):</label>
-            <input type="number" id="thickness" step="0.01">
-        </div>
-
-        <div class="input-group">
-            <label>Density:</label>
-            <input type="number" id="density" step="0.001" value="7.85">
-        </div>
-
-        <button onclick="calculate()">Calculate</button>
-        
-        <div id="result"></div>
     </div>
 
     <script>
-        const presets = {
-            coil: [1000, 925, 0.47, 8.039],
-            sheet: [2450, 1225, 0.4, 8.039],
-            slit: [50000, 150, 0.3, 8.039],
-            plate: [2450, 1225, 0.4, 7.85]
-        };
-
-        function loadPreset() {
-            const type = document.getElementById('productType').value;
-            if (type !== 'custom') {
-                const [l, w, t, d] = presets[type];
-                document.getElementById('length').value = l;
-                document.getElementById('width').value = w;
-                document.getElementById('thickness').value = t;
-                document.getElementById('density').value = d;
-            }
-        }
-
-        function calculate() {
+        // Weight calculation function
+        function calculateWeight() {
             const length = parseFloat(document.getElementById('length').value);
             const width = parseFloat(document.getElementById('width').value);
             const thickness = parseFloat(document.getElementById('thickness').value);
             const density = parseFloat(document.getElementById('density').value);
 
-            if ([length, width, thickness, density].some(isNaN)) {
-                alert("Please fill all fields with valid numbers");
-                return;
-            }
+            const weight = (length * width * thickness * density) / 1000000;
+            document.getElementById('weightResult').innerHTML = 
+                `Weight: ${weight.toFixed(2)} kg`;
+        }
 
-            const kgEach = (length * width * thickness * density) / 1000000;
-            document.getElementById('result').innerHTML = 
-                `Calculated Weight: ${kgEach.toFixed(6)} Kg/each`;
+        // Price per meter calculation
+        function calculatePricePerMeter() {
+            const width = parseFloat(document.getElementById('priceWidth').value);
+            const thickness = parseFloat(document.getElementById('priceThickness').value);
+            const density = parseFloat(document.getElementById('priceDensity').value);
+            const randPerTon = parseFloat(document.getElementById('randPerTon').value);
+
+            const kgPerMeter = (width * thickness * density) / 1000;
+            const pricePerMeter = (kgPerMeter / 1000) * randPerTon;
+            document.getElementById('pricePerMeter').innerHTML = 
+                `Price per meter: R${pricePerMeter.toFixed(2)}`;
+        }
+
+        // Price per ton calculation
+        function calculatePricePerTon() {
+            const width = parseFloat(document.getElementById('priceWidth').value);
+            const thickness = parseFloat(document.getElementById('priceThickness').value);
+            const density = parseFloat(document.getElementById('priceDensity').value);
+            const randPerMeter = parseFloat(document.getElementById('randPerMeter').value);
+
+            const kgPerMeter = (width * thickness * density) / 1000;
+            const pricePerTon = (randPerMeter * 1000) / kgPerMeter;
+            document.getElementById('pricePerTon').innerHTML = 
+                `Price per ton: R${pricePerTon.toFixed(2)}`;
         }
     </script>
 </body>
