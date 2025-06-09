@@ -51,7 +51,7 @@
         <div class="row">
           <div class="col">
             <label for="modeSelect">Calculation Mode</label>
-            <select id="modeSelect" aria-label="Calculation Mode">
+            <select id="modeSelect">
               <option value="length" selected>Enter Length (meters)</option>
               <option value="weight">Enter Total Weight (tons)</option>
             </select>
@@ -60,23 +60,23 @@
         <div class="row">
           <div class="col">
             <label for="width">Width (mm)</label>
-            <input type="number" id="width" value="925" min="1" step="0.01" inputmode="decimal" aria-label="Width in millimeters" />
+            <input type="number" id="width" value="925" min="1" step="0.01" />
           </div>
           <div class="col">
             <label for="thickness">Thickness (mm)</label>
-            <input type="number" id="thickness" value="0.5" min="0.01" step="0.01" inputmode="decimal" aria-label="Thickness in millimeters" />
+            <input type="number" id="thickness" value="0.5" min="0.01" step="0.01" />
           </div>
           <div class="col" id="lengthCol">
             <label for="lengthM">Length (meters)</label>
-            <input type="number" id="lengthM" value="1" min="0.001" step="0.001" inputmode="decimal" aria-label="Length in meters" />
+            <input type="number" id="lengthM" value="1" min="0.001" step="0.001" />
           </div>
           <div class="col" id="tonCol" style="display:none;">
             <label for="totalTonInput">Total Weight (tons)</label>
-            <input type="number" id="totalTonInput" value="1" min="0.0001" step="0.0001" inputmode="decimal" aria-label="Total weight in tons" />
+            <input type="number" id="totalTonInput" value="1" min="0.0001" step="0.0001" />
           </div>
           <div class="col">
             <label for="density">Density (g/cm³)</label>
-            <select id="density" aria-label="Material density">
+            <select id="density">
               <option value="8.039" selected>8.039</option>
               <option value="7.85">7.85</option>
             </select>
@@ -99,15 +99,15 @@
         <div class="row">
           <div class="col">
             <label for="pricePerKg">Price per kg (R/kg)</label>
-            <input type="number" id="pricePerKg" value="20" min="0.01" step="0.01" inputmode="decimal" aria-label="Price per kilogram" />
+            <input type="number" id="pricePerKg" value="20" min="0.01" step="0.01" />
           </div>
           <div class="col">
             <label for="weightEach">Weight each (kg)</label>
-            <input type="number" id="weightEach" value="4.662" min="0.01" step="0.001" inputmode="decimal" aria-label="Weight each in kilograms" />
+            <input type="number" id="weightEach" value="4.662" min="0.01" step="0.001" />
           </div>
           <div class="col">
             <label for="markup">GP %</label>
-            <input type="number" id="markup" value="25" min="0" max="99.99" step="0.1" inputmode="decimal" aria-label="Gross profit percentage" />
+            <input type="number" id="markup" value="25" min="0" max="99.99" step="0.1" />
           </div>
         </div>
         <div class="button-row">
@@ -133,15 +133,25 @@
     const lengthCol = document.getElementById("lengthCol");
     const tonCol = document.getElementById("tonCol");
     const calcCostBtn = document.getElementById("calcCostBtn");
-
     const weightEachField = document.getElementById("weightEach");
     const markupInput = document.getElementById("markup");
+
+    function showError(message, fieldId) {
+      document.getElementById("weightError").textContent = message;
+      if (fieldId) document.getElementById(fieldId).focus();
+      calcCostBtn.disabled = true;
+    }
+
+    function showCostError(message, fieldId) {
+      document.getElementById("costError").textContent = message;
+      if (fieldId) document.getElementById(fieldId).focus();
+    }
 
     modeSelect.addEventListener("change", () => {
       const isWeightMode = modeSelect.value === "weight";
       lengthCol.style.display = isWeightMode ? "none" : "block";
       tonCol.style.display = isWeightMode ? "block" : "none";
-      calculateWeight(); // auto recalc on mode switch
+      calculateWeight();
     });
 
     markupInput.addEventListener("input", () => {
@@ -162,14 +172,16 @@
         const density = parseFloat(document.getElementById("density").value) * 1000;
         const isLengthMode = modeSelect.value === "length";
 
-        if (isNaN(width) || isNaN(thickness) || isNaN(density)) throw "Invalid input for dimensions or density.";
+        if (!width) return showError("Please enter a valid width.", "width");
+        if (!thickness) return showError("Please enter a valid thickness.", "thickness");
+        if (!density) return showError("Please select a material density.", "density");
 
         const kgPerM = width * thickness * density;
         let totalMeters, totalTons, weightEachKg;
 
         if (isLengthMode) {
           const lengthM = parseFloat(document.getElementById("lengthM").value);
-          if (isNaN(lengthM)) throw "Invalid length.";
+          if (!lengthM) return showError("Please enter a valid length.", "lengthM");
           totalMeters = lengthM;
           totalTons = (kgPerM * lengthM) / 1000;
           weightEachKg = kgPerM * lengthM;
@@ -177,7 +189,7 @@
           weightEachField.value = weightEachKg.toFixed(3);
         } else {
           const totalTonInput = parseFloat(document.getElementById("totalTonInput").value);
-          if (isNaN(totalTonInput)) throw "Invalid tonnage.";
+          if (!totalTonInput) return showError("Please enter the total weight in tons.", "totalTonInput");
           totalTons = totalTonInput;
           totalMeters = (totalTonInput * 1000) / kgPerM;
           document.getElementById("weightEachKg").textContent = "-";
@@ -189,8 +201,7 @@
         document.getElementById("weightResults").style.display = "block";
         enableCostButton();
       } catch (err) {
-        document.getElementById("weightError").textContent = err;
-        calcCostBtn.disabled = true;
+        showError("An error occurred during weight calculation.");
       }
     }
 
@@ -206,8 +217,9 @@
         const weightEach = parseFloat(weightEachField.value);
         const gp = parseFloat(markupInput.value) || 0;
 
-        if (isNaN(pricePerKg) || isNaN(weightEach)) throw "Invalid price or weight.";
-        if (gp >= 100) throw "GP% must be less than 100%.";
+        if (!pricePerKg) return showCostError("Please enter a valid price per kg.", "pricePerKg");
+        if (!weightEach) return showCostError("Please enter a valid weight.", "weightEach");
+        if (gp >= 100) return showCostError("GP% must be less than 100%.", "markup");
 
         const costPerMeter = pricePerKg * weightEach;
         const costPerTon = pricePerKg * 1000;
@@ -226,7 +238,7 @@
         document.getElementById("totalSelling").textContent = "R " + nf.format(totalSelling);
         document.getElementById("costResults").style.display = "block";
       } catch (err) {
-        document.getElementById("costError").textContent = err;
+        showCostError("An error occurred during cost calculation.");
       }
     });
 
