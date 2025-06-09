@@ -1,179 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Freestock Calculators</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f9fa; margin: 0; padding: 0; }
-        .container { max-width: 800px; margin: 40px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 32px; }
-        h1 { text-align: center; color: #2d3e50; margin-bottom: 10px; }
-        .instructions { text-align: center; color: #444; margin-bottom: 28px; }
-        h2 { color: #1b5fc6; border-bottom: 1px solid #eee; padding-bottom: 4px; }
-        .segment { margin-bottom: 32px; }
-        label { display: block; margin: 12px 0 6px; font-weight: 600; }
-        input[type="number"], select { width: 100%; padding: 8px; font-size: 1em; border: 1px solid #ccc; border-radius: 4px; }
-        .row { display: flex; gap: 16px; flex-wrap: wrap; }
-        .col { flex: 1; min-width: 180px; }
-        .results { background: #f1f3f6; border-radius: 8px; margin-top: 18px; padding: 18px; }
-        .result-item { margin: 8px 0; }
-        .result-label { font-weight: 500; }
-        button {
-            display: block;
-            background: #2d7ff9; color: #fff; border: none; padding: 16px 0;
-            border-radius: 5px; font-size: 1.2em; cursor: pointer; width: 100%;
-            margin: 24px 0 0 0; font-weight: bold; letter-spacing: 1px;
-            box-shadow: 0 2px 6px rgba(44,127,249,0.07);
-            transition: background 0.2s;
-        }
-        button:hover { background: #1b5fc6; }
-        .button-row { display: flex; gap: 16px; flex-wrap: wrap; }
-        @media (max-width: 600px) {
-            .row, .button-row { flex-direction: column; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Freestock Calculators</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f9fa; margin: 0; padding: 0; }
+    .container { max-width: 800px; margin: 40px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 32px; }
+    h1 { text-align: center; color: #2d3e50; margin-bottom: 10px; }
+    .instructions { text-align: center; color: #444; margin-bottom: 28px; }
+    h2 { color: #1b5fc6; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+    .segment { margin-bottom: 32px; }
+    label { display: block; margin: 12px 0 6px; font-weight: 600; }
+    input[type="number"], select { width: 100%; padding: 8px; font-size: 1em; border: 1px solid #ccc; border-radius: 4px; }
+    .row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .col { flex: 1; min-width: 180px; }
+    .results { background: #f1f3f6; border-radius: 8px; margin-top: 18px; padding: 18px; }
+    .result-item { margin: 8px 0; }
+    .result-label { font-weight: 500; }
+    button {
+      display: block;
+      background: #2d7ff9; color: #fff; border: none; padding: 16px 0;
+      border-radius: 5px; font-size: 1.2em; cursor: pointer; width: 100%;
+      margin: 24px 0 0 0; font-weight: bold; letter-spacing: 1px;
+      box-shadow: 0 2px 6px rgba(44,127,249,0.07);
+      transition: background 0.2s;
+    }
+    button:hover { background: #1b5fc6; }
+    .button-row { display: flex; gap: 16px; flex-wrap: wrap; }
+    @media (max-width: 600px) {
+      .row, .button-row { flex-direction: column; }
+    }
+    .error { color: red; font-size: 0.9em; text-align: center; margin-top: 10px; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Freestock Calculators</h1>
-        <div class="instructions">
-            Enter your values in the input fields below.<br>
-            Click <strong>Calculate</strong> first, then <strong>Calculate Cost & Selling</strong>.
-        </div>
-        <form id="calcForm" autocomplete="off" onsubmit="return false;">
-            <!-- Weight Segment -->
-            <div class="segment">
-                <h2>Product Dimensions</h2>
-                <div class="row">
-                    <div class="col">
-                        <label for="modeSelect">Calculation Mode</label>
-                        <select id="modeSelect">
-                            <option value="length" selected>Enter Length (meters)</option>
-                            <option value="weight">Enter Total Weight (tons)</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <label for="width">Width (mm)</label>
-                        <input type="number" id="width" value="925" min="1" step="0.01" required>
-                    </div>
-                    <div class="col">
-                        <label for="thickness">Thickness (mm)</label>
-                        <input type="number" id="thickness" value="0.5" min="0.01" step="0.01" required>
-                    </div>
-                    <div class="col" id="lengthCol">
-                        <label for="lengthM">Length (meters)</label>
-                        <input type="number" id="lengthM" value="1" min="0.001" step="0.001" required>
-                    </div>
-                    <div class="col" id="tonCol" style="display:none;">
-                        <label for="totalTonInput">Total Weight (tons)</label>
-                        <input type="number" id="totalTonInput" value="1" min="0.0001" step="0.0001">
-                    </div>
-                    <div class="col">
-                        <label for="density">Density (g/cm³)</label>
-                        <select id="density">
-                            <option value="8.039" selected>8.039</option>
-                            <option value="7.85">7.85</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="button-row">
-                    <button type="button" id="calcWeightBtn">Calculate Weight</button>
-                </div>
-                <div class="results" id="weightResults" style="display:none;">
-                    <div class="result-item"><span class="result-label">Weight per meter:</span> <span id="kgPerM"></span></div>
-                    <div class="result-item"><span class="result-label">Weight each:</span> <span id="weightEachKg"></span></div>
-                    <div class="result-item"><span class="result-label">Total meters:</span> <span id="totalMeters"></span></div>
-                    <div class="result-item"><span class="result-label">Total tons:</span> <span id="totalTons"></span></div>
-                </div>
-            </div>
-
-            <!-- Cost Calculations Segment -->
-            <div class="segment">
-                <h2>Price Calculations</h2>
-                <div class="row">
-                    <div class="col">
-                        <label for="pricePerKg">Cost(R/kg)</label>
-                        <input type="number" id="pricePerKg" value="20" min="0.01" step="0.01" required>
-                    </div>
-                    <div class="col">
-                        <label for="weightEach">Weight each (kg)</label>
-                        <input type="number" id="weightEach" value="4.662" min="0.01" step="0.001" required>
-                    </div>
-                </div>
-                <div class="button-row">
-                    <button type="button" id="calcCostBtn">Calculate Cost & Selling</button>
-                </div>
-                <div class="results" id="costResults" style="display:none;">
-                    <div class="result-item"><span class="result-label">Cost per meter (R):</span> <span id="costPerM"></span></div>
-                    <div class="result-item"><span class="result-label">Cost per ton (R):</span> <span id="costPerTon"></span></div>
-                </div>
-            </div>
-        </form>
+  <div class="container">
+    <h1>Freestock Calculators</h1>
+    <div class="instructions">
+      Enter your values in the input fields below.<br>
+      Click <strong>Calculate</strong> first, then <strong>Calculate Cost & Selling</strong>.
     </div>
+    <form id="calcForm" autocomplete="off" onsubmit="return false;">
+      <!-- Weight Segment -->
+      <div class="segment">
+        <h2>Product Dimensions</h2>
+        <div class="row">
+          <div class="col">
+            <label for="modeSelect">Calculation Mode</label>
+            <select id="modeSelect">
+              <option value="length" selected>Enter Length (meters)</option>
+              <option value="weight">Enter Total Weight (tons)</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <label for="width">Width (mm)</label>
+            <input type="number" id="width" value="925" min="1" step="0.01" required>
+          </div>
+          <div class="col">
+            <label for="thickness">Thickness (mm)</label>
+            <input type="number" id="thickness" value="0.5" min="0.01" step="0.01" required>
+          </div>
+          <div class="col" id="lengthCol">
+            <label for="lengthM">Length (meters)</label>
+            <input type="number" id="lengthM" value="1" min="0.001" step="0.001" required>
+          </div>
+          <div class="col" id="tonCol" style="display:none;">
+            <label for="totalTonInput">Total Weight (tons)</label>
+            <input type="number" id="totalTonInput" value="1" min="0.0001" step="0.0001">
+          </div>
+          <div class="col">
+            <label for="density">Density (g/cm³)</label>
+            <select id="density">
+              <option value="8.039" selected>8.039</option>
+              <option value="7.85">7.85</option>
+            </select>
+          </div>
+        </div>
+        <div class="button-row">
+          <button type="button" id="calcWeightBtn">Calculate Weight</button>
+        </div>
+        <div class="results" id="weightResults" style="display:none;">
+          <div class="result-item"><span class="result-label">Weight per meter:</span> <span id="kgPerM"></span></div>
+          <div class="result-item"><span class="result-label">Weight each:</span> <span id="weightEachKg"></span></div>
+          <div class="result-item"><span class="result-label">Total meters:</span> <span id="totalMeters"></span></div>
+          <div class="result-item"><span class="result-label">Total tons:</span> <span id="totalTons"></span></div>
+        </div>
+        <div class="error" id="weightError"></div>
+      </div>
 
-    <script>
-        const modeSelect = document.getElementById("modeSelect");
-        const lengthCol = document.getElementById("lengthCol");
-        const tonCol = document.getElementById("tonCol");
+      <!-- Cost Calculations Segment -->
+      <div class="segment">
+        <h2>Cost Calculations</h2>
+        <div class="row">
+          <div class="col">
+            <label for="pricePerKg">Price per kg (R/kg)</label>
+            <input type="number" id="pricePerKg" value="20" min="0.01" step="0.01" required>
+          </div>
+          <div class="col">
+            <label for="weightEach">Weight each (kg)</label>
+            <input type="number" id="weightEach" value="4.662" min="0.01" step="0.001" required>
+          </div>
+          <div class="col">
+            <label for="markup">Markup %</label>
+            <input type="number" id="markup" value="25" min="0" step="0.1">
+          </div>
+        </div>
+        <div class="button-row">
+          <button type="button" id="calcCostBtn">Calculate Cost & Selling</button>
+          <button type="reset" id="resetBtn">Reset</button>
+        </div>
+        <div class="results" id="costResults" style="display:none;">
+          <div class="result-item"><span class="result-label">Cost per meter (R):</span> <span id="costPerM"></span></div>
+          <div class="result-item"><span class="result-label">Cost per ton (R):</span> <span id="costPerTon"></span></div>
+          <div class="result-item"><span class="result-label">Selling price per meter (R):</span> <span id="sellingPerM"></span></div>
+        </div>
+        <div class="error" id="costError"></div>
+      </div>
+    </form>
+  </div>
 
-        modeSelect.addEventListener("change", () => {
-            if (modeSelect.value === "weight") {
-                lengthCol.style.display = "none";
-                tonCol.style.display = "block";
-            } else {
-                lengthCol.style.display = "block";
-                tonCol.style.display = "none";
-            }
-        });
+  <script>
+    const modeSelect = document.getElementById("modeSelect");
+    const lengthCol = document.getElementById("lengthCol");
+    const tonCol = document.getElementById("tonCol");
 
-        document.getElementById("calcWeightBtn").addEventListener("click", () => {
-            const width = parseFloat(document.getElementById("width").value) / 1000;
-            const thickness = parseFloat(document.getElementById("thickness").value) / 1000;
-            const density = parseFloat(document.getElementById("density").value) * 1000;
+    const nf = new Intl.NumberFormat('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
 
-            let kgPerM = width * thickness * density;
-            document.getElementById("kgPerM").textContent = kgPerM.toFixed(3) + " kg/m";
+    modeSelect.addEventListener("change", () => {
+      lengthCol.style.display = modeSelect.value === "weight" ? "none" : "block";
+      tonCol.style.display = modeSelect.value === "weight" ? "block" : "none";
+    });
 
-            let totalMeters, totalTons, weightEachKg;
+    document.getElementById("calcWeightBtn").addEventListener("click", () => {
+      try {
+        document.getElementById("weightError").textContent = "";
+        const width = parseFloat(document.getElementById("width").value) / 1000;
+        const thickness = parseFloat(document.getElementById("thickness").value) / 1000;
+        const density = parseFloat(document.getElementById("density").value) * 1000;
 
-            if (modeSelect.value === "length") {
-                const lengthM = parseFloat(document.getElementById("lengthM").value);
-                totalMeters = lengthM;
-                totalTons = (kgPerM * lengthM) / 1000;
-                weightEachKg = kgPerM * lengthM;
+        if (isNaN(width) || isNaN(thickness) || isNaN(density)) throw "Invalid input for dimensions or density.";
 
-                // Show new "Weight each" row
-                document.getElementById("weightEachKg").textContent = weightEachKg.toFixed(3) + " kg";
+        const kgPerM = width * thickness * density;
+        let totalMeters, totalTons, weightEachKg;
 
-                // Auto-fill Cost Calculation "Weight each" input
-                document.getElementById("weightEach").value = weightEachKg.toFixed(3);
-            } else {
-                const totalTonInput = parseFloat(document.getElementById("totalTonInput").value);
-                totalTons = totalTonInput;
-                totalMeters = (totalTonInput * 1000) / kgPerM;
+        if (modeSelect.value === "length") {
+          const lengthM = parseFloat(document.getElementById("lengthM").value);
+          if (isNaN(lengthM)) throw "Invalid length.";
+          totalMeters = lengthM;
+          totalTons = (kgPerM * lengthM) / 1000;
+          weightEachKg = kgPerM * lengthM;
+          document.getElementById("weightEachKg").textContent = nf.format(weightEachKg) + " kg";
+          document.getElementById("weightEach").value = weightEachKg.toFixed(3);
+        } else {
+          const totalTonInput = parseFloat(document.getElementById("totalTonInput").value);
+          if (isNaN(totalTonInput)) throw "Invalid tonnage.";
+          totalTons = totalTonInput;
+          totalMeters = (totalTonInput * 1000) / kgPerM;
+          document.getElementById("weightEachKg").textContent = "-";
+        }
 
-                // Clear weightEach if in ton mode
-                document.getElementById("weightEachKg").textContent = "-";
-            }
+        document.getElementById("kgPerM").textContent = nf.format(kgPerM) + " kg/m";
+        document.getElementById("totalMeters").textContent = nf.format(totalMeters) + " m";
+        document.getElementById("totalTons").textContent = nf.format(totalTons) + " tons";
+        document.getElementById("weightResults").style.display = "block";
+      } catch (err) {
+        document.getElementById("weightError").textContent = err;
+      }
+    });
 
-            document.getElementById("totalMeters").textContent = totalMeters.toFixed(2) + " m";
-            document.getElementById("totalTons").textContent = totalTons.toFixed(3) + " tons";
-            document.getElementById("weightResults").style.display = "block";
-        });
+    document.getElementById("calcCostBtn").addEventListener("click", () => {
+      try {
+        document.getElementById("costError").textContent = "";
+        const pricePerKg = parseFloat(document.getElementById("pricePerKg").value);
+        const weightEach = parseFloat(document.getElementById("weightEach").value);
+        const markup = parseFloat(document.getElementById("markup").value) || 0;
 
-        document.getElementById("calcCostBtn").addEventListener("click", () => {
-            const pricePerKg = parseFloat(document.getElementById("pricePerKg").value);
-            const weightEach = parseFloat(document.getElementById("weightEach").value);
+        if (isNaN(pricePerKg) || isNaN(weightEach)) throw "Invalid price or weight.";
+        const costPerMeter = pricePerKg * weightEach;
+        const costPerTon = pricePerKg * 1000;
+        const sellingPricePerM = costPerMeter * (1 + markup / 100);
 
-            const costPerMeter = pricePerKg * weightEach;
-            const costPerTon = pricePerKg * 1000;
+        document.getElementById("costPerM").textContent = "R " + nf.format(costPerMeter);
+        document.getElementById("costPerTon").textContent = "R " + nf.format(costPerTon);
+        document.getElementById("sellingPerM").textContent = "R " + nf.format(sellingPricePerM);
+        document.getElementById("costResults").style.display = "block";
+      } catch (err) {
+        document.getElementById("costError").textContent = err;
+      }
+    });
 
-            document.getElementById("costPerM").textContent = "R " + costPerMeter.toFixed(2);
-            document.getElementById("costPerTon").textContent = "R " + costPerTon.toFixed(2);
-            document.getElementById("costResults").style.display = "block";
-        });
-    </script>
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      document.getElementById("weightResults").style.display = "none";
+      document.getElementById("costResults").style.display = "none";
+      document.getElementById("weightError").textContent = "";
+      document.getElementById("costError").textContent = "";
+    });
+  </script>
 </body>
 </html>
