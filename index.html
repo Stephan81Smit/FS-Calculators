@@ -38,7 +38,7 @@
         <h1>Freestock Calculators</h1>
         <div class="instructions">
             Enter your values in the input fields below.<br>
-            Click <strong>Calculate Weight/Length</strong> first, then <strong>Calculate Cost & Selling</strong>.
+            Click <strong>Calculate Weight</strong> first, then <strong>Calculate Cost & Selling</strong>.
         </div>
         <form id="calcForm" autocomplete="off" onsubmit="return false;">
 
@@ -80,7 +80,7 @@
                     </div>
                 </div>
                 <div class="button-row">
-                    <button type="button" id="calcWeightBtn">Calculate Weight from Length</button>
+                    <button type="button" id="calcWeightBtn">Calculate Weight</button>
                 </div>
                 <div class="results" id="weightResults" style="display:none;">
                     <div class="result-item"><span class="result-label">kg/m:</span> <span id="kgPerM"></span></div>
@@ -172,4 +172,63 @@
             document.getElementById('weightResults').style.display = 'block';
             document.getElementById('kgPerM').textContent = kgPerM + " kg";
             document.getElementById('totalMeters').textContent = totalMeters + " m";
-            document.getElementById('totalTons').textContent =
+            document.getElementById('totalTons').textContent = totalTons + " ton";
+            document.getElementById('totalKg').textContent = totalKg + " kg";
+        }
+
+        function calculateCostSelling() {
+            // Use latest calculated weight values
+            if (latestKgPerM === null || latestTotalKg === null) {
+                alert("Please calculate Weight first.");
+                return;
+            }
+            const pricePerKg = parseFloat(document.getElementById('pricePerKg').value); // R/kg
+            const weightEach = parseFloat(document.getElementById('weightEach').value); // kg
+            const desiredGP = parseFloat(document.getElementById('desiredGP').value) / 100; // as decimal
+
+            // Cost calculations
+            const costPerM = r4(latestKgPerM * pricePerKg);
+            const costPerTon = r4(pricePerKg * 1000);
+            const priceEach = r4(weightEach * pricePerKg);
+
+            // Selling calculations
+            const sellingPerM = r4(costPerM / (1 - desiredGP));
+            const sellingPerTon = r4(costPerTon / (1 - desiredGP));
+            const sellingEach = r4(priceEach / (1 - desiredGP));
+
+            // Display results
+            document.getElementById('costResults').style.display = 'block';
+            document.getElementById('sellingResults').style.display = 'block';
+            document.getElementById('costPerM').textContent = "R " + costPerM;
+            document.getElementById('costPerTon').textContent = "R " + costPerTon;
+            document.getElementById('priceEach').textContent = "R " + priceEach;
+            document.getElementById('sellingPerM').textContent = "R " + sellingPerM;
+            document.getElementById('sellingPerTon').textContent = "R " + sellingPerTon;
+            document.getElementById('sellingEach').textContent = "R " + sellingEach;
+        }
+
+        // Toggle input fields based on mode
+        document.getElementById('modeSelect').addEventListener('change', function() {
+            if (this.value === "length") {
+                document.getElementById('lengthCol').style.display = '';
+                document.getElementById('tonCol').style.display = 'none';
+                document.getElementById('lengthM').required = true;
+                document.getElementById('totalTonInput').required = false;
+            } else {
+                document.getElementById('lengthCol').style.display = 'none';
+                document.getElementById('tonCol').style.display = '';
+                document.getElementById('lengthM').required = false;
+                document.getElementById('totalTonInput').required = true;
+            }
+        });
+
+        document.getElementById('calcWeightBtn').addEventListener('click', function() {
+            calculateWeight();
+        });
+
+        document.getElementById('calcCostBtn').addEventListener('click', function() {
+            calculateCostSelling();
+        });
+    </script>
+</body>
+</html>
