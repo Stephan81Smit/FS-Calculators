@@ -1,22 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Freestock Calculators</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f9fa; margin: 0; padding: 0; }
     .container { max-width: 800px; margin: 40px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 32px; }
     h1 { text-align: center; color: #2d3e50; margin-bottom: 10px; }
     .instructions { text-align: center; color: #444; margin-bottom: 28px; }
-    h2 { color: #1b5fc6; border-bottom: 1px solid #eee; padding-bottom: 4px; }
-    .segment { margin-bottom: 32px; }
+    fieldset { border: none; padding: 0; margin: 0 0 32px; }
+    legend { font-size: 1.5em; color: #1b5fc6; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 16px; display: block; }
     label { display: block; margin: 12px 0 6px; font-weight: 600; }
     input[type="number"], select {
       width: 100%; padding: 8px; font-size: 1em;
       border: 1px solid #ccc; border-radius: 4px;
     }
-    input.invalid { border-color: red; }
     .row { display: flex; gap: 16px; flex-wrap: wrap; }
     .col { flex: 1; min-width: 180px; }
     .results { background: #f1f3f6; border-radius: 8px; margin-top: 18px; padding: 18px; }
@@ -30,25 +29,25 @@
       box-shadow: 0 2px 6px rgba(44,127,249,0.07);
       transition: background 0.2s;
     }
-    button:hover { background: #1b5fc6; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+    button:hover:enabled { background: #1b5fc6; }
     .button-row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .error { color: red; font-size: 0.9em; text-align: center; margin-top: 10px; }
     @media (max-width: 600px) {
       .row, .button-row { flex-direction: column; }
     }
-    .error { color: red; font-size: 0.9em; text-align: center; margin-top: 10px; }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Freestock Calculators</h1>
     <div class="instructions">
-      Enter your values in the input fields below.<br>
+      Enter your values in the input fields below.<br />
       Click <strong>Calculate</strong> first, then <strong>Calculate Cost & Selling</strong>.
     </div>
     <form id="calcForm" autocomplete="off" onsubmit="return false;">
-      <!-- Weight Segment -->
-      <fieldset class="segment">
-        <legend><h2>Product Dimensions</h2></legend>
+      <fieldset>
+        <legend>Product Dimensions</legend>
         <div class="row">
           <div class="col">
             <label for="modeSelect">Calculation Mode</label>
@@ -61,19 +60,19 @@
         <div class="row">
           <div class="col">
             <label for="width">Width (mm)</label>
-            <input type="number" id="width" value="925" min="1" step="0.01" inputmode="decimal" aria-label="Width in millimeters">
+            <input type="number" id="width" value="925" min="1" step="0.01" inputmode="decimal" aria-label="Width in millimeters" />
           </div>
           <div class="col">
             <label for="thickness">Thickness (mm)</label>
-            <input type="number" id="thickness" value="0.5" min="0.01" step="0.01" inputmode="decimal" aria-label="Thickness in millimeters">
+            <input type="number" id="thickness" value="0.5" min="0.01" step="0.01" inputmode="decimal" aria-label="Thickness in millimeters" />
           </div>
           <div class="col" id="lengthCol">
             <label for="lengthM">Length (meters)</label>
-            <input type="number" id="lengthM" value="1" min="0.001" step="0.001" inputmode="decimal" aria-label="Length in meters">
+            <input type="number" id="lengthM" value="1" min="0.001" step="0.001" inputmode="decimal" aria-label="Length in meters" />
           </div>
           <div class="col" id="tonCol" style="display:none;">
             <label for="totalTonInput">Total Weight (tons)</label>
-            <input type="number" id="totalTonInput" value="1" min="0.0001" step="0.0001" inputmode="decimal" aria-label="Total weight in tons">
+            <input type="number" id="totalTonInput" value="1" min="0.0001" step="0.0001" inputmode="decimal" aria-label="Total weight in tons" />
           </div>
           <div class="col">
             <label for="density">Density (g/cm³)</label>
@@ -86,7 +85,7 @@
         <div class="button-row">
           <button type="button" id="calcWeightBtn">Calculate</button>
         </div>
-        <div class="results" id="weightResults" style="display:none;">
+        <div class="results" id="weightResults" style="display:none;" aria-live="polite">
           <div class="result-item"><span class="result-label">Weight per meter:</span> <span id="kgPerM"></span></div>
           <div class="result-item"><span class="result-label">Weight each:</span> <span id="weightEachKg"></span></div>
           <div class="result-item"><span class="result-label">Total meters:</span> <span id="totalMeters"></span></div>
@@ -95,28 +94,27 @@
         <div class="error" id="weightError"></div>
       </fieldset>
 
-      <!-- Cost Calculations Segment -->
-      <fieldset class="segment">
-        <legend><h2>Cost Calculations</h2></legend>
+      <fieldset>
+        <legend>Cost Calculations</legend>
         <div class="row">
           <div class="col">
             <label for="pricePerKg">Price per kg (R/kg)</label>
-            <input type="number" id="pricePerKg" value="20" min="0.01" step="0.01" inputmode="decimal" aria-label="Price per kilogram">
+            <input type="number" id="pricePerKg" value="20" min="0.01" step="0.01" inputmode="decimal" aria-label="Price per kilogram" />
           </div>
           <div class="col">
             <label for="weightEach">Weight each (kg)</label>
-            <input type="number" id="weightEach" value="4.662" min="0.01" step="0.001" inputmode="decimal" aria-label="Weight each in kilograms">
+            <input type="number" id="weightEach" value="4.662" min="0.01" step="0.001" inputmode="decimal" aria-label="Weight each in kilograms" />
           </div>
           <div class="col">
             <label for="markup">GP %</label>
-            <input type="number" id="markup" value="25" min="0" max="99.99" step="0.1" inputmode="decimal" aria-label="Gross profit percentage">
+            <input type="number" id="markup" value="25" min="0" max="99.99" step="0.1" inputmode="decimal" aria-label="Gross profit percentage" />
           </div>
         </div>
         <div class="button-row">
-          <button type="button" id="calcCostBtn">Calculate</button>
+          <button type="button" id="calcCostBtn" disabled>Calculate</button>
           <button type="reset" id="resetBtn">Reset</button>
         </div>
-        <div class="results" id="costResults" style="display:none;">
+        <div class="results" id="costResults" style="display:none;" aria-live="polite">
           <div class="result-item"><span class="result-label">Cost per meter:</span> <span id="costPerM"></span></div>
           <div class="result-item"><span class="result-label">Cost per ton:</span> <span id="costPerTon"></span></div>
           <div class="result-item"><span class="result-label">Selling price per meter:</span> <span id="sellingPerM"></span></div>
@@ -134,14 +132,27 @@
     const modeSelect = document.getElementById("modeSelect");
     const lengthCol = document.getElementById("lengthCol");
     const tonCol = document.getElementById("tonCol");
+    const calcCostBtn = document.getElementById("calcCostBtn");
 
-    const inputs = ["width", "thickness", "lengthM", "density"].map(id => document.getElementById(id));
     const weightEachField = document.getElementById("weightEach");
+    const markupInput = document.getElementById("markup");
 
     modeSelect.addEventListener("change", () => {
-      lengthCol.style.display = modeSelect.value === "weight" ? "none" : "block";
-      tonCol.style.display = modeSelect.value === "weight" ? "block" : "none";
+      const isWeightMode = modeSelect.value === "weight";
+      lengthCol.style.display = isWeightMode ? "none" : "block";
+      tonCol.style.display = isWeightMode ? "block" : "none";
+      calculateWeight(); // auto recalc on mode switch
     });
+
+    markupInput.addEventListener("input", () => {
+      markupInput.setCustomValidity(
+        parseFloat(markupInput.value) >= 100 ? "GP% must be less than 100%" : ""
+      );
+    });
+
+    function enableCostButton() {
+      calcCostBtn.disabled = false;
+    }
 
     function calculateWeight() {
       try {
@@ -149,13 +160,14 @@
         const width = parseFloat(document.getElementById("width").value) / 1000;
         const thickness = parseFloat(document.getElementById("thickness").value) / 1000;
         const density = parseFloat(document.getElementById("density").value) * 1000;
+        const isLengthMode = modeSelect.value === "length";
 
         if (isNaN(width) || isNaN(thickness) || isNaN(density)) throw "Invalid input for dimensions or density.";
 
         const kgPerM = width * thickness * density;
         let totalMeters, totalTons, weightEachKg;
 
-        if (modeSelect.value === "length") {
+        if (isLengthMode) {
           const lengthM = parseFloat(document.getElementById("lengthM").value);
           if (isNaN(lengthM)) throw "Invalid length.";
           totalMeters = lengthM;
@@ -175,20 +187,24 @@
         document.getElementById("totalMeters").textContent = nf.format(totalMeters);
         document.getElementById("totalTons").textContent = nf.format(totalTons);
         document.getElementById("weightResults").style.display = "block";
+        enableCostButton();
       } catch (err) {
         document.getElementById("weightError").textContent = err;
+        calcCostBtn.disabled = true;
       }
     }
 
     document.getElementById("calcWeightBtn").addEventListener("click", calculateWeight);
-    inputs.forEach(input => input.addEventListener("input", calculateWeight));
+    ["width", "thickness", "lengthM", "totalTonInput", "density"].forEach(id => {
+      document.getElementById(id).addEventListener("input", calculateWeight);
+    });
 
     document.getElementById("calcCostBtn").addEventListener("click", () => {
       try {
         document.getElementById("costError").textContent = "";
         const pricePerKg = parseFloat(document.getElementById("pricePerKg").value);
         const weightEach = parseFloat(weightEachField.value);
-        const gp = parseFloat(document.getElementById("markup").value) || 0;
+        const gp = parseFloat(markupInput.value) || 0;
 
         if (isNaN(pricePerKg) || isNaN(weightEach)) throw "Invalid price or weight.";
         if (gp >= 100) throw "GP% must be less than 100%.";
@@ -198,7 +214,8 @@
         const sellingPricePerM = costPerMeter / (1 - gp / 100);
 
         const totalMetersText = document.getElementById("totalMeters").textContent;
-        const totalMeters = parseFloat(totalMetersText) || 0;
+        const totalMeters = parseFloat(totalMetersText.replace(/[^0-9.]/g, "")) || 0;
+
         const totalCost = costPerMeter * totalMeters;
         const totalSelling = sellingPricePerM * totalMeters;
 
@@ -218,6 +235,7 @@
       document.getElementById("costResults").style.display = "none";
       document.getElementById("weightError").textContent = "";
       document.getElementById("costError").textContent = "";
+      calcCostBtn.disabled = true;
     });
   </script>
 </body>
