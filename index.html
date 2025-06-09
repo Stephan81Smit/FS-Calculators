@@ -46,6 +46,15 @@
                 <h2>Weight</h2>
                 <div class="row">
                     <div class="col">
+                        <label for="modeSelect">Calculation Mode</label>
+                        <select id="modeSelect">
+                            <option value="length" selected>Enter Length (mm)</option>
+                            <option value="weight">Enter Total kg</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
                         <label for="width">Width (mm)</label>
                         <input type="number" id="width" value="925" min="1" step="0.01" required>
                     </div>
@@ -53,15 +62,19 @@
                         <label for="thickness">Thickness (mm)</label>
                         <input type="number" id="thickness" value="0.5" min="0.01" step="0.01" required>
                     </div>
-                    <div class="col">
+                    <div class="col" id="lengthCol">
                         <label for="length">Length (mm)</label>
                         <input type="number" id="length" value="1000" min="1" step="0.01" required>
+                    </div>
+                    <div class="col" id="kgCol" style="display:none;">
+                        <label for="totalKgInput">Total kg</label>
+                        <input type="number" id="totalKgInput" min="0.01" step="0.01">
                     </div>
                     <div class="col">
                         <label for="density">Density (g/cm³)</label>
                         <select id="density">
-                            <option value="8.039" selected>8.039 </option>
-                            <option value="7.85">7.85 </option>
+                            <option value="8.039" selected>8.039</option>
+                            <option value="7.85">7.85</option>
                         </select>
                     </div>
                 </div>
@@ -117,80 +130,21 @@
         function r4(val) { return Math.round(val * 10000) / 10000; }
 
         function calculate() {
-            // Inputs
+            const mode = document.getElementById('modeSelect').value;
             const width = parseFloat(document.getElementById('width').value);         // mm
             const thickness = parseFloat(document.getElementById('thickness').value); // mm
-            const length = parseFloat(document.getElementById('length').value);       // mm
             const density = parseFloat(document.getElementById('density').value);     // g/cm³
             const pricePerKg = parseFloat(document.getElementById('pricePerKg').value); // R/kg
             const weightEach = parseFloat(document.getElementById('weightEach').value); // kg
             const desiredGP = parseFloat(document.getElementById('desiredGP').value) / 100; // as decimal
 
-            // Weight calculations
+            // Weight per meter
             const kgPerM = r4((width * thickness * density) / 1000);
-            const totalMeters = r4(length / 1000);
-            const totalKg = r4(totalMeters * kgPerM);
 
-            // Cost calculations
-            const costPerM = r4(kgPerM * pricePerKg);
-            const costPerTon = r4(pricePerKg * 1000);
-            const priceEach = r4(weightEach * pricePerKg);
+            let totalMeters = 0, totalKg = 0;
 
-            // Selling calculations
-            const sellingPerM = r4(costPerM / (1 - desiredGP));
-            const sellingPerTon = r4(costPerTon / (1 - desiredGP));
-            const sellingEach = r4(priceEach / (1 - desiredGP));
-
-            // Display results
-            document.getElementById('weightResults').style.display = 'block';
-            document.getElementById('costResults').style.display = 'block';
-            document.getElementById('sellingResults').style.display = 'block';
-
-            document.getElementById('kgPerM').textContent = kgPerM + " kg";
-            document.getElementById('totalMeters').textContent = totalMeters + " m";
-            document.getElementById('totalKg').textContent = totalKg + " kg";
-            document.getElementById('costPerM').textContent = "R " + costPerM;
-            document.getElementById('costPerTon').textContent = "R " + costPerTon;
-            document.getElementById('priceEach').textContent = "R " + priceEach;
-            document.getElementById('sellingPerM').textContent = "R " + sellingPerM;
-            document.getElementById('sellingPerTon').textContent = "R " + sellingPerTon;
-            document.getElementById('sellingEach').textContent = "R " + sellingEach;
-        }
-
-        document.getElementById('calcForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            calculate();
-        });
-    </script>
-
-    <!-- Chatbase Script -->
-    <script>
-    (function(){
-        if(!window.chatbase||window.chatbase("getState")!=="initialized"){
-            window.chatbase=(...arguments)=>{
-                if(!window.chatbase.q){window.chatbase.q=[]}
-                window.chatbase.q.push(arguments)
-            };
-            window.chatbase=new Proxy(window.chatbase,{
-                get(target,prop){
-                    if(prop==="q"){return target.q}
-                    return(...args)=>target(prop,...args)
-                }
-            })
-        }
-        const onLoad=function(){
-            const script=document.createElement("script");
-            script.src="https://www.chatbase.co/embed.min.js";
-            script.id="1CUdC6SSwd2fp3AIWKW43";
-            script.domain="www.chatbase.co";
-            document.body.appendChild(script)
-        };
-        if(document.readyState==="complete"){
-            onLoad()
-        } else {
-            window.addEventListener("load",onLoad)
-        }
-    })();
-    </script>
-</body>
-</html>
+            if (mode === "length") {
+                const length = parseFloat(document.getElementById('length').value); // mm
+                totalMeters = r4(length / 1000);
+                totalKg = r4(totalMeters * kgPerM);
+            } else {
