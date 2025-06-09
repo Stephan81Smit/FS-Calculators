@@ -41,10 +41,9 @@
             Click <strong>Calculate Weight</strong> first, then <strong>Calculate Cost & Selling</strong>.
         </div>
         <form id="calcForm" autocomplete="off" onsubmit="return false;">
-
             <!-- Weight Segment -->
             <div class="segment">
-                <h2>Product Dimensions</h2>
+                <h2>Weight</h2>
                 <div class="row">
                     <div class="col">
                         <label for="modeSelect">Calculation Mode</label>
@@ -80,10 +79,11 @@
                     </div>
                 </div>
                 <div class="button-row">
-                    <button type="button" id="calcWeightBtn">Calculate</button>
+                    <button type="button" id="calcWeightBtn">Calculate Weight</button>
                 </div>
                 <div class="results" id="weightResults" style="display:none;">
-                    <div class="result-item"><span class="result-label">kg/meter:</span> <span id="kgPerM"></span></div>
+                    <div class="result-item"><span class="result-label">Weight per meter:</span> <span id="kgPerM"></span></div>
+                    <div class="result-item"><span class="result-label">Weight each:</span> <span id="weightEachKg"></span></div>
                     <div class="result-item"><span class="result-label">Total meters:</span> <span id="totalMeters"></span></div>
                     <div class="result-item"><span class="result-label">Total tons:</span> <span id="totalTons"></span></div>
                 </div>
@@ -136,19 +136,26 @@
             let kgPerM = width * thickness * density;
             document.getElementById("kgPerM").textContent = kgPerM.toFixed(3) + " kg/m";
 
-            // Auto-fill weightEach field in Cost Calculations
-            document.getElementById("weightEach").value = kgPerM.toFixed(3);
-
-            let totalMeters, totalTons;
+            let totalMeters, totalTons, weightEachKg;
 
             if (modeSelect.value === "length") {
                 const lengthM = parseFloat(document.getElementById("lengthM").value);
                 totalMeters = lengthM;
                 totalTons = (kgPerM * lengthM) / 1000;
+                weightEachKg = kgPerM * lengthM;
+
+                // Show new "Weight each" row
+                document.getElementById("weightEachKg").textContent = weightEachKg.toFixed(3) + " kg";
+
+                // Auto-fill Cost Calculation "Weight each" input
+                document.getElementById("weightEach").value = weightEachKg.toFixed(3);
             } else {
                 const totalTonInput = parseFloat(document.getElementById("totalTonInput").value);
                 totalTons = totalTonInput;
                 totalMeters = (totalTonInput * 1000) / kgPerM;
+
+                // Clear weightEach if in ton mode
+                document.getElementById("weightEachKg").textContent = "-";
             }
 
             document.getElementById("totalMeters").textContent = totalMeters.toFixed(2) + " m";
