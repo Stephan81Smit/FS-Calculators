@@ -42,10 +42,31 @@
     @media (max-width: 600px) {
       .row, .button-row { flex-direction: column; gap: 0; }
       .col { min-width: 100%; margin-bottom: 8px; }
+      .results-table th, .results-table td { font-size: 1em; }
     }
     .results { background: #f1f3f6; border-radius: 8px; margin-top: 18px; padding: 18px; }
-    .result-item { margin: 8px 0; }
-    .result-label { font-weight: 500; }
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .results-table th, .results-table td {
+      padding: 10px 8px;
+      text-align: left;
+      border-bottom: 1px solid #ececec;
+    }
+    .results-table th {
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #1b5fc6;
+    }
+    .results-table tr:last-child td {
+      border-bottom: none;
+    }
     button {
       display: block; background: #2d7ff9; color: #fff; border: none;
       padding: 16px 0; border-radius: 5px; font-size: 1.2em;
@@ -105,11 +126,30 @@
           </div>
         </div>
         <div class="results" id="weightResults" style="display:none;" aria-live="polite">
-          <div class="result-item"><span class="result-label">Weight per meter:</span> <span id="kgPerM"></span></div>
-          <div class="result-item"><span class="result-label">Weight each:</span> <span id="weightEachKg"></span></div>
-          <div class="result-item"><span class="result-label">Total weight:</span> <span id="totalWeight"></span></div>
-          <div class="result-item"><span class="result-label">Total meters:</span> <span id="totalMeters"></span></div>
-          <div class="result-item"><span class="result-label">Total tons:</span> <span id="totalTons"></span></div>
+          <table class="results-table">
+            <tbody>
+              <tr>
+                <th>Weight per meter</th>
+                <td id="kgPerM"></td>
+              </tr>
+              <tr>
+                <th>Weight each</th>
+                <td id="weightEachKg"></td>
+              </tr>
+              <tr>
+                <th>Total weight</th>
+                <td id="totalWeight"></td>
+              </tr>
+              <tr>
+                <th>Total meters</th>
+                <td id="totalMeters"></td>
+              </tr>
+              <tr>
+                <th>Total tons</th>
+                <td id="totalTons"></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div class="error" id="weightError"></div>
       </fieldset>
@@ -130,18 +170,37 @@
             <input type="number" id="markup" value="25" min="0" max="99.99" step="0.1" />
           </div>
         </div>
-        <div class="button-row">
-          <button type="reset" id="resetBtn">Reset</button>
-        </div>
         <div class="results" id="costResults" style="display:none;" aria-live="polite">
-          <div class="result-item"><span class="result-label">Cost per meter:</span> <span id="costPerM"></span></div>
-          <div class="result-item"><span class="result-label">Cost per ton:</span> <span id="costPerTon"></span></div>
-          <div class="result-item"><span class="result-label">Selling price per meter:</span> <span id="sellingPerM"></span></div>
-          <div class="result-item"><span class="result-label">Total Cost:</span> <span id="totalCost"></span></div>
-          <div class="result-item"><span class="result-label">Total Selling Price:</span> <span id="totalSelling"></span></div>
+          <table class="results-table">
+            <tbody>
+              <tr>
+                <th>Cost per meter</th>
+                <td id="costPerM"></td>
+              </tr>
+              <tr>
+                <th>Cost per ton</th>
+                <td id="costPerTon"></td>
+              </tr>
+              <tr>
+                <th>Selling price per meter</th>
+                <td id="sellingPerM"></td>
+              </tr>
+              <tr>
+                <th>Total Cost</th>
+                <td id="totalCost"></td>
+              </tr>
+              <tr>
+                <th>Total Selling Price</th>
+                <td id="totalSelling"></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div class="error" id="costError"></div>
       </fieldset>
+
+      <!-- Reset button now at the very bottom of the form -->
+      <button type="reset" id="resetBtn">Reset</button>
     </form>
   </div>
 
