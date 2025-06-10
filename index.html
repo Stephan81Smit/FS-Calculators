@@ -1,4 +1,4 @@
-<!DOCTYPE html>More actions
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -172,6 +172,7 @@
     function calculateWeight() {
       try {
         document.getElementById("weightError").textContent = "";
+
         const width = parseFloat(document.getElementById("width").value) / 1000;
         const thickness = parseFloat(document.getElementById("thickness").value) / 1000;
         const density = parseFloat(document.getElementById("density").value) * 1000;
@@ -183,25 +184,27 @@
         if (!density) return showError("Please select a material density.", "density");
 
         const kgPerM = width * thickness * density;
-        let totalMeters, totalTons, weightEachKg;
         let totalMeters, totalTons, weightEachKg, totalWeight;
 
         if (isLengthMode) {
           const lengthM = parseFloat(document.getElementById("lengthM").value);
           if (!lengthM) return showError("Please enter a valid length.", "lengthM");
-          totalMeters = lengthM;
-          totalTons = (kgPerM * lengthM) / 1000;
-          totalTons = (kgPerM * lengthM * quantity) / 1000;
+
+          totalMeters = lengthM * quantity;
           weightEachKg = kgPerM * lengthM;
           totalWeight = weightEachKg * quantity;
+          totalTons = totalWeight / 1000;
+
           document.getElementById("weightEachKg").textContent = nf.format(weightEachKg) + " kg";
           document.getElementById("totalWeight").textContent = nf.format(totalWeight) + " kg";
           weightEachField.value = weightEachKg.toFixed(3);
         } else {
           const totalTonInput = parseFloat(document.getElementById("totalTonInput").value);
           if (!totalTonInput) return showError("Please enter the total weight in tons.", "totalTonInput");
+
           totalTons = totalTonInput;
           totalMeters = (totalTonInput * 1000) / kgPerM;
+
           document.getElementById("weightEachKg").textContent = "-";
           document.getElementById("totalWeight").textContent = nf.format(totalTonInput * 1000) + " kg";
         }
@@ -210,6 +213,7 @@
         document.getElementById("totalMeters").textContent = nf.format(totalMeters);
         document.getElementById("totalTons").textContent = nf.format(totalTons);
         document.getElementById("weightResults").style.display = "block";
+
         enableCostButton();
       } catch (err) {
         showError("An error occurred during weight calculation.");
@@ -217,7 +221,7 @@
     }
 
     document.getElementById("calcWeightBtn").addEventListener("click", calculateWeight);
-    ["width", "thickness", "lengthM", "totalTonInput", "density"].forEach(id => {
+
     ["width", "thickness", "lengthM", "totalTonInput", "density", "quantity"].forEach(id => {
       document.getElementById(id).addEventListener("input", calculateWeight);
     });
