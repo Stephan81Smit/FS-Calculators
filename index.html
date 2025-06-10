@@ -86,7 +86,6 @@
             </select>
           </div>
         </div>
-        <!-- Button removed here -->
         <div class="results" id="weightResults" style="display:none;" aria-live="polite">
           <div class="result-item"><span class="result-label">Weight per meter:</span> <span id="kgPerM"></span></div>
           <div class="result-item"><span class="result-label">Weight each:</span> <span id="weightEachKg"></span></div>
@@ -114,7 +113,6 @@
           </div>
         </div>
         <div class="button-row">
-          <button type="button" id="calcCostBtn" disabled>Calculate</button>
           <button type="reset" id="resetBtn">Reset</button>
         </div>
         <div class="results" id="costResults" style="display:none;" aria-live="polite">
@@ -135,16 +133,13 @@
     const modeSelect = document.getElementById("modeSelect");
     const lengthCol = document.getElementById("lengthCol");
     const tonCol = document.getElementById("tonCol");
-    const calcCostBtn = document.getElementById("calcCostBtn");
     const weightEachField = document.getElementById("weightEach");
     const markupInput = document.getElementById("markup");
 
     function showError(message, fieldId) {
       document.getElementById("weightError").textContent = message;
       if (fieldId) document.getElementById(fieldId).focus();
-      calcCostBtn.disabled = true;
     }
-
     function showCostError(message, fieldId) {
       document.getElementById("costError").textContent = message;
       if (fieldId) document.getElementById(fieldId).focus();
@@ -162,10 +157,6 @@
         parseFloat(markupInput.value) >= 100 ? "GP% must be less than 100%" : ""
       );
     });
-
-    function enableCostButton() {
-      calcCostBtn.disabled = false;
-    }
 
     function calculateWeight() {
       try {
@@ -212,20 +203,13 @@
         document.getElementById("totalTons").textContent = nf.format(totalTons);
         document.getElementById("weightResults").style.display = "block";
 
-        enableCostButton();
+        calculateCost(); // Trigger cost calculation automatically
       } catch (err) {
         showError("An error occurred during weight calculation.");
       }
     }
 
-    // Removed the button event listener here
-    // document.getElementById("calcWeightBtn").addEventListener("click", calculateWeight);
-
-    ["width", "thickness", "lengthM", "totalTonInput", "density", "quantity"].forEach(id => {
-      document.getElementById(id).addEventListener("input", calculateWeight);
-    });
-
-    document.getElementById("calcCostBtn").addEventListener("click", () => {
+    function calculateCost() {
       try {
         document.getElementById("costError").textContent = "";
         const pricePerKg = parseFloat(document.getElementById("pricePerKg").value);
@@ -256,6 +240,14 @@
       } catch (err) {
         showCostError("An error occurred during cost calculation.");
       }
+    }
+
+    ["width", "thickness", "lengthM", "totalTonInput", "density", "quantity"].forEach(id => {
+      document.getElementById(id).addEventListener("input", calculateWeight);
+    });
+
+    ["pricePerKg", "weightEach", "markup"].forEach(id => {
+      document.getElementById(id).addEventListener("input", calculateCost);
     });
 
     document.getElementById("resetBtn").addEventListener("click", () => {
@@ -264,7 +256,6 @@
       document.getElementById("weightError").textContent = "";
       document.getElementById("costError").textContent = "";
       document.getElementById("quantity").value = "1";
-      calcCostBtn.disabled = true;
     });
 
     // Trigger initial calculation on page load
