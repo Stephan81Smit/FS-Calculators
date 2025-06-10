@@ -41,10 +41,6 @@
 <body>
   <div class="container">
     <h1>Freestock Calculators</h1>
-    <div class="instructions">
-      Enter your values in the input fields below.<br />
-      The results update automatically as you change values.
-    </div>
     <form id="calcForm" autocomplete="off" onsubmit="return false;">
       <fieldset>
         <legend>Product Dimensions</legend>
@@ -97,7 +93,7 @@
       </fieldset>
 
       <fieldset>
-        <legend>Cost Calculations</legend>
+        <legend>Pricing</legend>
         <div class="row">
           <div class="col">
             <label for="pricePerKg">Price per kg (R/kg)</label>
@@ -169,7 +165,7 @@
         const isLengthMode = modeSelect.value === "length";
 
         if (!width) return showError("Please enter a valid width.", "width");
-        if (!thickness) return showError("Please enter a valid thickness.", "thickness");
+        if (!thickness) return showError("Please  a valid thickness.", "thickness");
         if (!density) return showError("Please select a material density.", "density");
 
         const kgPerM = width * thickness * density;
