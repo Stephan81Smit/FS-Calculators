@@ -19,8 +19,6 @@
     .row { display: flex; gap: 16px; flex-wrap: wrap; }
     .col { flex: 1; min-width: 180px; }
     .results { background: #f1f3f6; border-radius: 8px; margin-top: 18px; padding: 18px; }
-    .result-item { margin: 8px 0; }
-    .result-label { font-weight: 500; }
     button {
       display: block; background: #2d7ff9; color: #fff; border: none;
       padding: 16px 0; border-radius: 5px; font-size: 1.2em;
@@ -33,8 +31,29 @@
     button:hover:enabled { background: #1b5fc6; }
     .button-row { display: flex; gap: 16px; flex-wrap: wrap; }
     .error { color: red; font-size: 0.9em; text-align: center; margin-top: 10px; }
+    table.result-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0;
+      background: transparent;
+    }
+    table.result-table th, table.result-table td {
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid #e2e6ea;
+      font-size: 1em;
+    }
+    table.result-table th {
+      background: #e9eef3;
+      font-weight: 600;
+      color: #1b5fc6;
+    }
+    table.result-table tr:last-child td {
+      border-bottom: none;
+    }
     @media (max-width: 600px) {
       .row, .button-row { flex-direction: column; }
+      table.result-table th, table.result-table td { font-size: 0.97em; }
     }
   </style>
 </head>
@@ -83,11 +102,32 @@
           </div>
         </div>
         <div class="results" id="weightResults" style="display:none;" aria-live="polite">
-          <div class="result-item"><span class="result-label">Weight per meter:</span> <span id="kgPerM"></span></div>
-          <div class="result-item"><span class="result-label">Weight each:</span> <span id="weightEachKg"></span></div>
-          <div class="result-item"><span class="result-label">Total weight:</span> <span id="totalWeight"></span></div>
-          <div class="result-item"><span class="result-label">Total meters:</span> <span id="totalMeters"></span></div>
-          <div class="result-item"><span class="result-label">Total tons:</span> <span id="totalTons"></span></div>
+          <table class="result-table" id="weightResultsTable">
+            <tr>
+              <th>Parameter</th>
+              <th>Value</th>
+            </tr>
+            <tr>
+              <td>Weight per meter</td>
+              <td id="kgPerM"></td>
+            </tr>
+            <tr>
+              <td>Weight each</td>
+              <td id="weightEachKg"></td>
+            </tr>
+            <tr>
+              <td>Total weight</td>
+              <td id="totalWeight"></td>
+            </tr>
+            <tr>
+              <td>Total meters</td>
+              <td id="totalMeters"></td>
+            </tr>
+            <tr>
+              <td>Total tons</td>
+              <td id="totalTons"></td>
+            </tr>
+          </table>
         </div>
         <div class="error" id="weightError"></div>
       </fieldset>
@@ -112,11 +152,32 @@
           <button type="reset" id="resetBtn">Reset</button>
         </div>
         <div class="results" id="costResults" style="display:none;" aria-live="polite">
-          <div class="result-item"><span class="result-label">Cost per meter:</span> <span id="costPerM"></span></div>
-          <div class="result-item"><span class="result-label">Cost per ton:</span> <span id="costPerTon"></span></div>
-          <div class="result-item"><span class="result-label">Selling price per meter:</span> <span id="sellingPerM"></span></div>
-          <div class="result-item"><span class="result-label">Total Cost:</span> <span id="totalCost"></span></div>
-          <div class="result-item"><span class="result-label">Total Selling Price:</span> <span id="totalSelling"></span></div>
+          <table class="result-table" id="costResultsTable">
+            <tr>
+              <th>Parameter</th>
+              <th>Value</th>
+            </tr>
+            <tr>
+              <td>Cost per meter</td>
+              <td id="costPerM"></td>
+            </tr>
+            <tr>
+              <td>Cost per ton</td>
+              <td id="costPerTon"></td>
+            </tr>
+            <tr>
+              <td>Selling price per meter</td>
+              <td id="sellingPerM"></td>
+            </tr>
+            <tr>
+              <td>Total Cost</td>
+              <td id="totalCost"></td>
+            </tr>
+            <tr>
+              <td>Total Selling Price</td>
+              <td id="totalSelling"></td>
+            </tr>
+          </table>
         </div>
         <div class="error" id="costError"></div>
       </fieldset>
