@@ -43,7 +43,7 @@
     <h1>Freestock Calculators</h1>
     <div class="instructions">
       Enter your values in the input fields below.<br />
-      Click <strong>Calculate</strong> first, then <strong>Calculate Cost & Selling</strong>.
+      The results update automatically as you change values.
     </div>
     <form id="calcForm" autocomplete="off" onsubmit="return false;">
       <fieldset>
@@ -86,9 +86,7 @@
             </select>
           </div>
         </div>
-        <div class="button-row">
-          <button type="button" id="calcWeightBtn">Calculate</button>
-        </div>
+        <!-- Button removed here -->
         <div class="results" id="weightResults" style="display:none;" aria-live="polite">
           <div class="result-item"><span class="result-label">Weight per meter:</span> <span id="kgPerM"></span></div>
           <div class="result-item"><span class="result-label">Weight each:</span> <span id="weightEachKg"></span></div>
@@ -220,7 +218,8 @@
       }
     }
 
-    document.getElementById("calcWeightBtn").addEventListener("click", calculateWeight);
+    // Removed the button event listener here
+    // document.getElementById("calcWeightBtn").addEventListener("click", calculateWeight);
 
     ["width", "thickness", "lengthM", "totalTonInput", "density", "quantity"].forEach(id => {
       document.getElementById(id).addEventListener("input", calculateWeight);
@@ -267,6 +266,9 @@
       document.getElementById("quantity").value = "1";
       calcCostBtn.disabled = true;
     });
+
+    // Trigger initial calculation on page load
+    window.addEventListener('DOMContentLoaded', calculateWeight);
   </script>
 </body>
 </html>
