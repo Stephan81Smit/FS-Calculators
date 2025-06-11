@@ -165,7 +165,7 @@
               <option value="slitcoil">Slit Coil</option>
             </select>
             <div class="shape-info" id="shapeInfo">
-              Method: Enter Length | Density: 8.039 g/cm³
+              Density: 8.039 g/cm³
             </div>
           </div>
         </div>
@@ -278,7 +278,7 @@
       // Autofill density field but do not make it readonly
       densityInput.value = config.density;
       document.getElementById('shapeInfo').textContent =
-        `Method: ${config.method === 'length' ? 'Enter Length' : 'Enter Total Weight'} | Density: ${config.density} g/cm³`;
+        `Density: ${config.density} g/cm³`;
       // Show/hide appropriate input fields
       document.getElementById('lengthCol').style.display = config.method === 'length' ? 'block' : 'none';
       document.getElementById('tonCol').style.display = config.method === 'weight' ? 'block' : 'none';
