@@ -146,6 +146,59 @@
       .col { min-width: 100%; }
       .results-table th, .results-table td { font-size: 1em; }
     }
+
+    /* --- MOBILE IMPROVEMENTS BELOW --- */
+    @media (max-width: 600px) {
+      .container {
+        padding: 12px;
+        border-radius: 0;
+        margin: 0;
+        box-shadow: none;
+      }
+      .row, .button-row, .dual-section {
+        flex-direction: column;
+        gap: 0;
+      }
+      .col, .dual-col {
+        min-width: 100%;
+        width: 100%;
+        margin-bottom: 12px;
+      }
+      h1 {
+        font-size: 1.4em;
+        margin-bottom: 6px;
+      }
+      legend {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+      }
+      h3 {
+        font-size: 1em;
+        margin-top: 10px;
+      }
+      .results {
+        overflow-x: auto;
+      }
+      .results-table {
+        min-width: 400px;
+        font-size: 0.98em;
+      }
+    }
+    body {
+      overflow-x: hidden;
+    }
+    @media (max-width: 600px) {
+      input[type="number"], select {
+        font-size: 1.1em;
+        padding: 14px 10px;
+      }
+      button {
+        padding: 18px 0;
+        font-size: 1.2em;
+        margin-top: 18px;
+      }
+    }
+    /* --- END MOBILE IMPROVEMENTS --- */
   </style>
 </head>
 <body>
@@ -322,9 +375,7 @@
         const thickness = parseFloat(document.getElementById('thickness').value) / 1000;
         const density = parseFloat(densityInput.value) * 1000; // Convert g/cm³ to kg/m³
         const selectedShape = shapeSelect.value;
-        const isLengthMode = shapeConfig[selectedShape].method === 'length';
-
-        if (!width || !thickness || !density) return;
+        const isLengthMode = shapeConfig[selectedShape].method === 'length'; if (!width || !thickness || !density) return;
 
         const kgPerM = width * thickness * density;
         let totalMeters, totalTons, weightEachKg, quantity;
@@ -401,7 +452,6 @@
       document.getElementById('costToSelling_gpPerItem').textContent = "R " + nf.format(gpPerItem);
       document.getElementById('costToSellingResults').style.display = "block";
     }
-
     function calculateSellingToCost() {
       const sellingPerTon = parseFloat(document.getElementById('sell_sellingPerTon').value);
       const weightEach = parseFloat(document.getElementById('sell_weightEach').value);
