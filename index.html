@@ -128,6 +128,14 @@
       flex: 1 1 380px;
       min-width: 320px;
     }
+    .shape-info {
+      background: #e8f4fd;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #1b5fc6;
+      margin-top: 8px;
+    }
     @media (max-width: 900px) {
       .col { flex: 1 1 100px; }
       .dual-col { min-width: 100%; }
@@ -149,11 +157,16 @@
         <legend>Product Dimensions</legend>
         <div class="row">
           <div class="col">
-            <label for="modeSelect">Calculation Mode</label>
-            <select id="modeSelect">
-              <option value="length" selected>Enter Length (meters)</option>
-              <option value="weight">Enter Total Weight (tons)</option>
+            <label for="shapeSelect">Product Shape</label>
+            <select id="shapeSelect">
+              <option value="sheet" selected>Sheet</option>
+              <option value="plate">Plate</option>
+              <option value="coil">Coil</option>
+              <option value="slitcoil">Slit Coil</option>
             </select>
+            <div class="shape-info" id="shapeInfo">
+              Method: Enter Length | Density: 8.039 g/cm³
+            </div>
           </div>
         </div>
         <div class="row">
@@ -176,13 +189,6 @@
           <div class="col">
             <label for="quantity">Qty</label>
             <input type="number" id="quantity" value="1" min="1" step="1" />
-          </div>
-          <div class="col">
-            <label for="density">Density (g/cm³)</label>
-            <select id="density">
-              <option value="8.039" selected>8.039</option>
-              <option value="7.85">7.85</option>
-            </select>
           </div>
         </div>
         <div class="results" id="weightResults" style="display:none;">
@@ -250,15 +256,45 @@
   <script>
     // Number formatting for 2 decimals
     const nf = new Intl.NumberFormat('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const modeSelect = document.getElementById("modeSelect");
+    
+    // Shape configuration data
+    const shapeConfig = {
+      sheet: { method: 'length', density: 8.039, name: 'Sheet' },
+      plate: { method: 'length', density: 7.85, name: 'Plate' },
+      coil: { method: 'weight', density: 8.039, name: 'Coil' },
+      slitcoil: { method: 'weight', density: 8.039, name: 'Slit Coil' }
+    };
+
+    const shapeSelect = document.getElementById("shapeSelect");
+    let currentDensity = 8.039; // Default density
+
+    function updateShapeInfo() {
+      const selectedShape = shapeSelect.value;
+      const config = shapeConfig[selectedShape];
+      
+      // Update info display
+      document.getElementById('shapeInfo').textContent = 
+        `Method: ${config.method === 'length' ? 'Enter Length' : 'Enter Total Weight'} | Density: ${config.density} g/cm³`;
+      
+      // Update calculation mode
+      currentDensity = config.density;
+      
+      // Show/hide appropriate input fields
+      document.getElementById('lengthCol').style.display = config.method === 'length' ? 'block' : 'none';
+      document.getElementById('tonCol').style.display = config.method === 'weight' ? 'block' : 'none';
+      
+      // Recalculate with new settings
+      calculateWeight();
+    }
 
     function calculateWeight() {
       try {
         const width = parseFloat(document.getElementById('width').value) / 1000;
         const thickness = parseFloat(document.getElementById('thickness').value) / 1000;
-        const density = parseFloat(document.getElementById('density').value) * 1000;
+        const density = currentDensity * 1000; // Convert g/cm³ to kg/m³
         const quantity = parseFloat(document.getElementById('quantity').value) || 1;
-        const isLengthMode = modeSelect.value === 'length';
+        const selectedShape = shapeSelect.value;
+        const isLengthMode = shapeConfig[selectedShape].method === 'length';
 
         if (!width || !thickness || !density) return;
 
@@ -335,13 +371,9 @@
     }
 
     // Event Listeners
-    modeSelect.addEventListener("change", () => {
-      document.getElementById('lengthCol').style.display = modeSelect.value === 'length' ? 'block' : 'none';
-      document.getElementById('tonCol').style.display = modeSelect.value === 'weight' ? 'block' : 'none';
-      calculateWeight();
-    });
+    shapeSelect.addEventListener("change", updateShapeInfo);
 
-    ["width", "thickness", "lengthM", "totalTonInput", "density", "quantity"].forEach(id => {
+    ["width", "thickness", "lengthM", "totalTonInput", "quantity"].forEach(id => {
       document.getElementById(id).addEventListener("input", calculateWeight);
     });
 
@@ -358,8 +390,9 @@
       document.querySelectorAll('.error').forEach(el => el.textContent = "");
     });
 
-    // Initial calculations
+    // Initial setup
     window.addEventListener('DOMContentLoaded', () => {
+      updateShapeInfo();
       calculateWeight();
       calculateCostToSelling();
       calculateSellingToCost();
