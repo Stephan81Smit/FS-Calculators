@@ -150,52 +150,89 @@
     /* --- MOBILE IMPROVEMENTS BELOW --- */
     @media (max-width: 600px) {
       .container {
-        padding: 12px;
+        padding: 8px;
         border-radius: 0;
         margin: 0;
         box-shadow: none;
+        max-width: 100vw;
       }
-      .row, .button-row, .dual-section {
-        flex-direction: column;
-        gap: 0;
+      .row,
+      .dual-section {
+        flex-direction: column !important;
+        gap: 0 !important;
       }
-      .col, .dual-col {
-        min-width: 100%;
-        width: 100%;
-        margin-bottom: 12px;
+      .col,
+      .dual-col {
+        min-width: 100% !important;
+        width: 100% !important;
+        margin-bottom: 14px !important;
       }
-      h1 {
-        font-size: 1.4em;
-        margin-bottom: 6px;
-      }
-      legend {
-        font-size: 1.1em;
-        margin-bottom: 10px;
-      }
-      h3 {
+      label {
+        padding: 0 0 4px 0;
         font-size: 1em;
-        margin-top: 10px;
       }
-      .results {
-        overflow-x: auto;
-      }
-      .results-table {
-        min-width: 400px;
-        font-size: 0.98em;
-      }
-    }
-    body {
-      overflow-x: hidden;
-    }
-    @media (max-width: 600px) {
-      input[type="number"], select {
+      input[type="number"],
+      select {
         font-size: 1.1em;
-        padding: 14px 10px;
+        padding: 16px 10px;
+        min-height: 44px;
+        margin-bottom: 12px;
       }
       button {
         padding: 18px 0;
         font-size: 1.2em;
         margin-top: 18px;
+        min-height: 48px;
+      }
+      h1 {
+        font-size: 1.3em;
+        margin-bottom: 8px;
+      }
+      legend {
+        font-size: 1.1em;
+        margin-bottom: 8px;
+      }
+      .results {
+        padding: 10px 2px;
+        margin-top: 10px;
+      }
+      /* Responsive table: convert to block/cards */
+      .results-table,
+      .results-table thead,
+      .results-table tbody,
+      .results-table tr,
+      .results-table th,
+      .results-table td {
+        display: block;
+        width: 100%;
+      }
+      .results-table tr {
+        margin-bottom: 12px;
+        border: 1px solid #ececec;
+        border-radius: 6px;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        padding: 8px 4px;
+      }
+      .results-table th {
+        background: none;
+        color: #1b5fc6;
+        font-weight: 600;
+        padding: 6px 4px 2px 4px;
+        border-bottom: none;
+        font-size: 1em;
+      }
+      .results-table td {
+        padding: 2px 4px 10px 4px;
+        font-size: 1em;
+        border-bottom: none;
+      }
+      .results-table tr:last-child {
+        margin-bottom: 0;
+      }
+      /* Hide table header row if present */
+      .results-table thead {
+        display: none;
       }
     }
     /* --- END MOBILE IMPROVEMENTS --- */
@@ -375,7 +412,8 @@
         const thickness = parseFloat(document.getElementById('thickness').value) / 1000;
         const density = parseFloat(densityInput.value) * 1000; // Convert g/cm³ to kg/m³
         const selectedShape = shapeSelect.value;
-        const isLengthMode = shapeConfig[selectedShape].method === 'length'; if (!width || !thickness || !density) return;
+        const isLengthMode = shapeConfig[selectedShape].method === 'length';
+        if (!width || !thickness || !density) return;
 
         const kgPerM = width * thickness * density;
         let totalMeters, totalTons, weightEachKg, quantity;
