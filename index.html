@@ -79,13 +79,24 @@
     button:hover:enabled { background: #1b5fc6; }
     .button-row { display: flex; gap: 16px; flex-wrap: wrap; }
     .error { color: red; font-size: 0.9em; text-align: center; margin-top: 10px; }
+    .question-section { margin-bottom: 32px; }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Freestock Calculators</h1>
     <form id="calcForm" autocomplete="off" onsubmit="return false;">
-      <fieldset>
+      <div class="question-section">
+        <label for="calculationType" style="font-size:1.2em;">What do you want to calculate?</label>
+        <select id="calculationType">
+          <option value="">Select...</option>
+          <option value="weight">Weight & Dimensions</option>
+          <option value="cost">Pricing & Selling</option>
+        </select>
+      </div>
+
+      <!-- Weight & Dimensions Section -->
+      <fieldset id="weightSection" style="display:none;">
         <legend>Product Dimensions</legend>
         <div class="row">
           <div class="col">
@@ -154,7 +165,8 @@
         <div class="error" id="weightError"></div>
       </fieldset>
 
-      <fieldset>
+      <!-- Pricing Section -->
+      <fieldset id="costSection" style="display:none;">
         <legend>Pricing</legend>
         <div class="row">
           <div class="col">
@@ -199,7 +211,6 @@
         <div class="error" id="costError"></div>
       </fieldset>
 
-      <!-- Reset button now at the very bottom of the form -->
       <button type="reset" id="resetBtn">Reset</button>
     </form>
   </div>
@@ -207,6 +218,27 @@
   <script>
     const nf = new Intl.NumberFormat('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
 
+    // Section toggling logic
+    const calculationType = document.getElementById("calculationType");
+    const weightSection = document.getElementById("weightSection");
+    const costSection = document.getElementById("costSection");
+
+    calculationType.addEventListener("change", function() {
+      if (this.value === "weight") {
+        weightSection.style.display = "block";
+        costSection.style.display = "none";
+        calculateWeight();
+      } else if (this.value === "cost") {
+        weightSection.style.display = "none";
+        costSection.style.display = "block";
+        calculateCost();
+      } else {
+        weightSection.style.display = "none";
+        costSection.style.display = "none";
+      }
+    });
+
+    // Existing logic for weight and cost calculation
     const modeSelect = document.getElementById("modeSelect");
     const lengthCol = document.getElementById("lengthCol");
     const tonCol = document.getElementById("tonCol");
@@ -222,20 +254,25 @@
       if (fieldId) document.getElementById(fieldId).focus();
     }
 
-    modeSelect.addEventListener("change", () => {
-      const isWeightMode = modeSelect.value === "weight";
-      lengthCol.style.display = isWeightMode ? "none" : "block";
-      tonCol.style.display = isWeightMode ? "block" : "none";
-      calculateWeight();
-    });
+    if (modeSelect) {
+      modeSelect.addEventListener("change", () => {
+        const isWeightMode = modeSelect.value === "weight";
+        lengthCol.style.display = isWeightMode ? "none" : "block";
+        tonCol.style.display = isWeightMode ? "block" : "none";
+        calculateWeight();
+      });
+    }
 
-    markupInput.addEventListener("input", () => {
-      markupInput.setCustomValidity(
-        parseFloat(markupInput.value) >= 100 ? "GP% must be less than 100%" : ""
-      );
-    });
+    if (markupInput) {
+      markupInput.addEventListener("input", () => {
+        markupInput.setCustomValidity(
+          parseFloat(markupInput.value) >= 100 ? "GP% must be less than 100%" : ""
+        );
+      });
+    }
 
     function calculateWeight() {
+      if (!weightSection || weightSection.style.display === "none") return;
       try {
         document.getElementById("weightError").textContent = "";
 
@@ -246,7 +283,7 @@
         const isLengthMode = modeSelect.value === "length";
 
         if (!width) return showError("Please enter a valid width.", "width");
-        if (!thickness) return showError("Please  a valid thickness.", "thickness");
+        if (!thickness) return showError("Please enter a valid thickness.", "thickness");
         if (!density) return showError("Please select a material density.", "density");
 
         const kgPerM = width * thickness * density;
@@ -260,7 +297,6 @@
           weightEachKg = kgPerM * lengthM;
           totalWeight = weightEachKg * quantity;
           totalTons = totalWeight / 1000;
-
           document.getElementById("weightEachKg").textContent = nf.format(weightEachKg) + " kg";
           document.getElementById("totalWeight").textContent = nf.format(totalWeight) + " kg";
           weightEachField.value = weightEachKg.toFixed(3);
@@ -287,12 +323,13 @@
     }
 
     function calculateCost() {
+      if (!costSection || costSection.style.display === "none") return;
       try {
         document.getElementById("costError").textContent = "";
         const pricePerKg = parseFloat(document.getElementById("pricePerKg").value);
         const weightEach = parseFloat(weightEachField.value);
         const gp = parseFloat(markupInput.value) || 0;
-        const quantity = parseFloat(document.getElementById("quantity").value) || 1;
+        const quantity = parseFloat(document.getElementById("quantity") ? document.getElementById("quantity").value : 1) || 1;
 
         if (!pricePerKg) return showCostError("Please enter a valid price per kg.", "pricePerKg");
         if (!weightEach) return showCostError("Please enter a valid weight.", "weightEach");
@@ -302,8 +339,12 @@
         const costPerTon = pricePerKg * 1000;
         const sellingPricePerM = costPerMeter / (1 - gp / 100);
 
-        const totalMetersText = document.getElementById("totalMeters").textContent;
-        const totalMeters = parseFloat(totalMetersText.replace(/[^0-9.]/g, "")) || 0;
+        // Try to get total meters from the weight section if available
+        let totalMeters = 0;
+        const totalMetersElem = document.getElementById("totalMeters");
+        if (totalMetersElem && totalMetersElem.textContent) {
+          totalMeters = parseFloat(totalMetersElem.textContent.replace(/[^0-9.]/g, "")) || 0;
+        }
 
         const totalCost = costPerMeter * totalMeters;
         const totalSelling = sellingPricePerM * totalMeters;
@@ -319,12 +360,15 @@
       }
     }
 
+    // Attach input events only if the fields exist
     ["width", "thickness", "lengthM", "totalTonInput", "density", "quantity"].forEach(id => {
-      document.getElementById(id).addEventListener("input", calculateWeight);
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("input", calculateWeight);
     });
 
     ["pricePerKg", "weightEach", "markup"].forEach(id => {
-      document.getElementById(id).addEventListener("input", calculateCost);
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("input", calculateCost);
     });
 
     document.getElementById("resetBtn").addEventListener("click", () => {
@@ -332,11 +376,14 @@
       document.getElementById("costResults").style.display = "none";
       document.getElementById("weightError").textContent = "";
       document.getElementById("costError").textContent = "";
-      document.getElementById("quantity").value = "1";
+      if (document.getElementById("quantity")) document.getElementById("quantity").value = "1";
+      calculationType.value = "";
+      weightSection.style.display = "none";
+      costSection.style.display = "none";
     });
 
-    // Trigger initial calculation on page load
-    window.addEventListener('DOMContentLoaded', calculateWeight);
+    // Optionally: trigger initial calculation if you want a default
+    // window.addEventListener('DOMContentLoaded', calculateWeight);
   </script>
 </body>
 </html>
