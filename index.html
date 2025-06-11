@@ -136,14 +136,6 @@
       flex: 1 1 380px;
       min-width: 320px;
     }
-    .shape-info {
-      background: #e8f4fd;
-      padding: 8px 12px;
-      border-radius: 4px;
-      font-size: 0.9em;
-      color: #1b5fc6;
-      margin-top: 8px;
-    }
     @media (max-width: 900px) {
       .col { min-width: 100%; }
       .dual-col { min-width: 100%; }
@@ -172,9 +164,6 @@
               <option value="coil">Coil</option>
               <option value="slitcoil">Slit Coil</option>
             </select>
-            <div class="shape-info" id="shapeInfo">
-              Density: 8.039 g/cm³
-            </div>
           </div>
         </div>
         <div class="row">
@@ -328,8 +317,6 @@
       const selectedShape = shapeSelect.value;
       const config = shapeConfig[selectedShape];
       densityInput.value = config.density;
-      document.getElementById('shapeInfo').textContent =
-        `Density: ${config.density} g/cm³`;
       document.getElementById('lengthCol').style.display = config.method === 'length' ? 'block' : 'none';
       document.getElementById('tonCol').style.display = config.method === 'weight' ? 'block' : 'none';
       calculateWeight();
