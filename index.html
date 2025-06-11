@@ -185,10 +185,10 @@
           </div>
           <div class="col">
             <label for="quantity">Qty</label>
-            <input type="number" id="quantity" value="1" min="1" step="1" />
+            <input type="number" id="quantity" value="1" min="1" step="1" readonly />
           </div>
           <div class="col">
-            <label for="density">Density (g/cmÃ‚Â³)</label>
+            <label for="density">Density (g/cm³)</label>
             <input type="number" id="density" value="8.039" min="6" max="9" step="0.001" />
           </div>
         </div>
@@ -272,32 +272,6 @@
       </fieldset>
     </form>
   </div>
-  <!-- Chatbase Chatbot Script -->
-  <script>
-    (function(){
-      if(!window.chatbase||window.chatbase("getState")!=="initialized"){
-        window.chatbase=(...arguments)=>{
-          if(!window.chatbase.q){window.chatbase.q=[]}
-          window.chatbase.q.push(arguments)
-        };
-        window.chatbase=new Proxy(window.chatbase,{
-          get(target,prop){
-            if(prop==="q"){return target.q}
-            return(...args)=>target(prop,...args)
-          }
-        })
-      }
-      const onLoad=function(){
-        const script=document.createElement("script");
-        script.src="https://www.chatbase.co/embed.min.js";
-        script.id="1CUdC6SSwd2fp3AIWKW43";
-        script.domain="www.chatbase.co";
-        document.body.appendChild(script)
-      };
-      if(document.readyState==="complete"){onLoad()}
-      else{window.addEventListener("load",onLoad)}
-    })();
-  </script>
   <script>
     // Number formatting for 2 decimals
     const nf = new Intl.NumberFormat('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -312,13 +286,32 @@
 
     const shapeSelect = document.getElementById("shapeSelect");
     const densityInput = document.getElementById("density");
+    const lengthCol = document.getElementById('lengthCol');
+    const tonCol = document.getElementById('tonCol');
+    const quantityInput = document.getElementById('quantity');
+    const lengthInput = document.getElementById('lengthM');
+    const totalTonInput = document.getElementById('totalTonInput');
 
     function updateShapeInfo() {
       const selectedShape = shapeSelect.value;
       const config = shapeConfig[selectedShape];
       densityInput.value = config.density;
-      document.getElementById('lengthCol').style.display = config.method === 'length' ? 'block' : 'none';
-      document.getElementById('tonCol').style.display = config.method === 'weight' ? 'block' : 'none';
+
+      if (selectedShape === 'coil') {
+        // Show length input and total ton input
+        lengthCol.style.display = 'block';
+        tonCol.style.display = 'block';
+        // Make quantity readonly, will calculate automatically
+        quantityInput.readOnly = true;
+      } else if (config.method === 'length') {
+        lengthCol.style.display = 'block';
+        tonCol.style.display = 'none';
+        quantityInput.readOnly = false;
+      } else {
+        lengthCol.style.display = 'none';
+        tonCol.style.display = 'block';
+        quantityInput.readOnly = false;
+      }
       calculateWeight();
     }
 
@@ -326,37 +319,58 @@
       try {
         const width = parseFloat(document.getElementById('width').value) / 1000;
         const thickness = parseFloat(document.getElementById('thickness').value) / 1000;
-        const density = parseFloat(densityInput.value) * 1000; // Convert g/cmÃ‚Â³ to kg/mÃ‚Â³
-        const quantity = parseFloat(document.getElementById('quantity').value) || 1;
+        const density = parseFloat(densityInput.value) * 1000; // Convert g/cm³ to kg/m³
         const selectedShape = shapeSelect.value;
         const isLengthMode = shapeConfig[selectedShape].method === 'length';
 
         if (!width || !thickness || !density) return;
 
         const kgPerM = width * thickness * density;
-        let totalMeters, totalTons, weightEachKg;
+        let totalMeters, totalTons, weightEachKg, quantity;
 
-        if (isLengthMode) {
-          const lengthM = parseFloat(document.getElementById('lengthM').value);
+        if (selectedShape === 'coil') {
+          // For coil, user inputs Length and Total Weight (tons)
+          const lengthM = parseFloat(lengthInput.value);
+          const totalTon = parseFloat(totalTonInput.value);
+          if (!lengthM || lengthM <= 0 || !totalTon || totalTon <= 0) {
+            quantityInput.value = '';
+            document.getElementById('weightResults').style.display = "none";
+            return;
+          }
+          totalMeters = (totalTon * 1000) / kgPerM; // total meters from total weight
+          quantity = totalMeters / lengthM; // Qty = total meters / length
+          quantityInput.value = quantity.toFixed(2);
+          weightEachKg = kgPerM * lengthM;
+        } else if (isLengthMode) {
+          // For sheet and plate
+          const lengthM = parseFloat(lengthInput.value);
+          quantity = parseFloat(quantityInput.value) || 1;
+          if (!lengthM || lengthM <= 0) return;
           totalMeters = lengthM * quantity;
           weightEachKg = kgPerM * lengthM;
-          document.getElementById('weightEachKg').textContent = nf.format(weightEachKg) + " kg";
-          document.getElementById('cost_weightEach').value = weightEachKg.toFixed(2);
-          document.getElementById('sell_weightEach').value = weightEachKg.toFixed(2);
         } else {
-          const totalTonInput = parseFloat(document.getElementById('totalTonInput').value);
-          totalMeters = (totalTonInput * 1000) / kgPerM;
+          // For slitcoil or other weight mode
+          const totalTon = parseFloat(totalTonInput.value);
+          quantity = parseFloat(quantityInput.value) || 1;
+          totalMeters = (totalTon * 1000) / kgPerM;
           weightEachKg = '-';
         }
 
-        const totalWeight = isLengthMode ? weightEachKg * quantity : parseFloat(document.getElementById('totalTonInput').value) * 1000;
+        const totalWeight = isLengthMode ? weightEachKg * quantity : parseFloat(totalTonInput.value) * 1000;
         totalTons = totalWeight / 1000;
 
         document.getElementById('kgPerM').textContent = nf.format(kgPerM) + " kg/m";
+        document.getElementById('weightEachKg').textContent = (weightEachKg === '-' ? '-' : nf.format(weightEachKg) + " kg");
+        document.getElementById('totalWeight').textContent = nf.format(totalWeight) + " kg";
         document.getElementById('totalMeters').textContent = nf.format(totalMeters) + " m";
         document.getElementById('totalTons').textContent = nf.format(totalTons) + " tons";
-        document.getElementById('totalWeight').textContent = nf.format(totalWeight) + " kg";
         document.getElementById('weightResults').style.display = "block";
+
+        // Update cost and selling weightEach inputs
+        if (weightEachKg !== '-') {
+          document.getElementById('cost_weightEach').value = weightEachKg.toFixed(2);
+          document.getElementById('sell_weightEach').value = weightEachKg.toFixed(2);
+        }
       } catch(err) {
         document.getElementById('weightError').textContent = "Error in calculation";
       }
@@ -402,10 +416,19 @@
       document.getElementById('sellingToCostResults').style.display = "block";
     }
 
-    shapeSelect.addEventListener("change", updateShapeInfo);
+    shapeSelect.addEventListener("change", () => {
+      updateShapeInfo();
+      calculateWeight();
+      calculateCostToSelling();
+      calculateSellingToCost();
+    });
 
     ["width", "thickness", "lengthM", "totalTonInput", "quantity", "density"].forEach(id => {
-      document.getElementById(id).addEventListener("input", calculateWeight);
+      document.getElementById(id).addEventListener("input", () => {
+        calculateWeight();
+        calculateCostToSelling();
+        calculateSellingToCost();
+      });
     });
 
     ["cost_pricePerTon", "cost_weightEach", "cost_gp"].forEach(id => {
@@ -419,6 +442,7 @@
     document.getElementById("resetBtn").addEventListener("click", () => {
       document.querySelectorAll('.results').forEach(el => el.style.display = "none");
       document.querySelectorAll('.error').forEach(el => el.textContent = "");
+      quantityInput.readOnly = false;
     });
 
     window.addEventListener('DOMContentLoaded', () => {
