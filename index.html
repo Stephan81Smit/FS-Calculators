@@ -5,26 +5,129 @@
   <title>Freestock Calculators</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f9fa; margin: 0; padding: 0; }
-    .container { max-width: 900px; margin: 40px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 32px; }
-    h1 { text-align: center; color: #2d3e50; margin-bottom: 10px; }
-    fieldset { border: none; padding: 0; margin: 0 0 32px; }
-    legend { font-size: 1.5em; color: #1b5fc6; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 16px; display: block; }
-    label { display: block; margin: 12px 0 6px; font-weight: 600; }
-    input[type="number"], select {
-      width: 100%; padding: 8px; font-size: 1em;
-      border: 1px solid #ccc; border-radius: 4px;
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 0;
     }
-    .row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 0; }
-    .col { flex: 1 1 120px; min-width: 120px; max-width: 100%; }
-    .results { background: #f1f3f6; border-radius: 8px; margin-top: 18px; padding: 18px; }
-    .results-table { width: 100%; border-collapse: collapse; margin: 0 auto; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
-    .results-table th, .results-table td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #ececec; }
-    .results-table th { background: #f8f9fa; font-weight: 600; color: #1b5fc6; }
-    button { display: block; background: #2d7ff9; color: #fff; border: none; padding: 16px 0; border-radius: 5px; cursor: pointer; width: 100%; margin: 24px 0 0 0; }
-    .error { color: red; font-size: 0.9em; text-align: center; margin-top: 10px; }
-    .dual-section { display: flex; gap: 24px; flex-wrap: wrap; }
-    .dual-col { flex: 1 1 380px; min-width: 320px; }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 32px;
+    }
+    h1 {
+      text-align: center;
+      color: #2d3e50;
+      margin-bottom: 10px;
+    }
+    fieldset {
+      border: none;
+      padding: 0;
+      margin: 0 0 32px;
+    }
+    legend {
+      font-size: 1.5em;
+      color: #1b5fc6;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 4px;
+      margin-bottom: 16px;
+      display: block;
+    }
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      font-weight: 600;
+    }
+    input[type="number"], select {
+      width: 100%;
+      padding: 8px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 0;
+    }
+    .col {
+      flex: 1 1 120px;
+      min-width: 120px;
+      max-width: 100%;
+    }
+    .results {
+      background: #f1f3f6;
+      border-radius: 8px;
+      margin-top: 18px;
+      padding: 18px;
+    }
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .results-table th, .results-table td {
+      padding: 10px 8px;
+      text-align: left;
+      border-bottom: 1px solid #ececec;
+      font-size: 1em;
+    }
+    .results-table th {
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #1b5fc6;
+    }
+    .results-table tr:last-child td {
+      border-bottom: none;
+    }
+    button {
+      display: block;
+      background: #2d7ff9;
+      color: #fff;
+      border: none;
+      padding: 16px 0;
+      border-radius: 5px;
+      font-size: 1.1em;
+      cursor: pointer;
+      width: 100%;
+      margin: 24px 0 0 0;
+      font-weight: bold;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 6px rgba(44,127,249,0.07);
+      transition: background 0.2s;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    button:hover:enabled {
+      background: #1b5fc6;
+    }
+    .error {
+      color: red;
+      font-size: 0.95em;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .dual-section {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .dual-col {
+      flex: 1 1 380px;
+      min-width: 320px;
+    }
     @media (max-width: 900px) {
       .col { flex: 1 1 100px; }
       .dual-col { min-width: 100%; }
@@ -33,13 +136,13 @@
     @media (max-width: 600px) {
       .row, .button-row { flex-direction: column; gap: 0; }
       .col { min-width: 100%; }
+      .results-table th, .results-table td { font-size: 1em; }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Freestock Calculators</h1>
-    
     <!-- Product Dimensions Section -->
     <form id="calcForm" autocomplete="off" onsubmit="return false;">
       <fieldset>
@@ -95,7 +198,6 @@
         </div>
         <div class="error" id="weightError"></div>
       </fieldset>
-
       <!-- Dual Pricing Calculators -->
       <fieldset>
         <legend>Pricing Calculators</legend>
@@ -145,7 +247,6 @@
       </fieldset>
     </form>
   </div>
-
   <script>
     // Number formatting for 2 decimals
     const nf = new Intl.NumberFormat('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -181,8 +282,8 @@
         totalTons = totalWeight / 1000;
 
         document.getElementById('kgPerM').textContent = nf.format(kgPerM) + " kg/m";
-        document.getElementById('totalMeters').textContent = nf.format(totalMeters);
-        document.getElementById('totalTons').textContent = nf.format(totalTons);
+        document.getElementById('totalMeters').textContent = nf.format(totalMeters) + " m";
+        document.getElementById('totalTons').textContent = nf.format(totalTons) + " tons";
         document.getElementById('totalWeight').textContent = nf.format(totalWeight) + " kg";
         document.getElementById('weightResults').style.display = "block";
       } catch(err) {
