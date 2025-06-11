@@ -153,7 +153,6 @@
         </div>
         <div class="error" id="weightError"></div>
       </fieldset>
-
       <fieldset>
         <legend>Pricing</legend>
         <div class="row">
@@ -198,12 +197,9 @@
         </div>
         <div class="error" id="costError"></div>
       </fieldset>
-
-      <!-- Reset button now at the very bottom of the form -->
       <button type="reset" id="resetBtn">Reset</button>
     </form>
   </div>
-
   <script>
     const nf = new Intl.NumberFormat('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 3 });
 
@@ -260,7 +256,6 @@
           weightEachKg = kgPerM * lengthM;
           totalWeight = weightEachKg * quantity;
           totalTons = totalWeight / 1000;
-
           document.getElementById("weightEachKg").textContent = nf.format(weightEachKg) + " kg";
           document.getElementById("totalWeight").textContent = nf.format(totalWeight) + " kg";
           weightEachField.value = weightEachKg.toFixed(3);
@@ -276,7 +271,7 @@
         }
 
         document.getElementById("kgPerM").textContent = nf.format(kgPerM) + " kg/m";
-        document.getElementById("totalMeters").textContent = nf.format(totalMeters);
+        document.getElementById("totalMeters").textContent = nf.format(totalMeters) + " m"; // <-- UNIT ADDED HERE
         document.getElementById("totalTons").textContent = nf.format(totalTons);
         document.getElementById("weightResults").style.display = "block";
 
