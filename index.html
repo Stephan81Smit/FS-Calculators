@@ -15,82 +15,83 @@
     }
     .container {
       max-width: 900px;
-      margin: 24px auto;
+      margin: 16px auto;
       background: #fff;
       border-radius: 10px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      padding: 20px 14px;
+      padding: 12px 8px;
     }
     h1 {
       text-align: center;
       color: #2d3e50;
       margin-bottom: 8px;
-      font-size: 1.6em;
+      font-size: 1.3em;
     }
     fieldset {
       border: none;
       padding: 0;
-      margin: 0 0 18px;
+      margin: 0 0 10px;
     }
     legend {
-      font-size: 1.2em;
+      font-size: 1.08em;
       color: #1b5fc6;
       border-bottom: 1px solid #eee;
-      padding-bottom: 2px;
-      margin-bottom: 10px;
+      padding-bottom: 0;
+      margin-bottom: 6px;
       display: block;
     }
     label {
       display: block;
-      margin-bottom: 2px;
-      font-weight: 600;
+      margin-bottom: 1px;
+      font-weight: 500;
       font-size: 0.98em;
       word-break: break-word;
     }
     input[type="number"], select {
       width: 100%;
-      padding: 6px 8px;
-      font-size: 1em;
+      padding: 4px 6px;
+      font-size: 0.97em;
       border: 1px solid #ccc;
-      border-radius: 4px;
-      margin-bottom: 4px;
+      border-radius: 3px;
+      margin-bottom: 0;
       box-sizing: border-box;
+      min-height: 28px;
     }
     .row {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
       margin-bottom: 0;
     }
     .col {
-      flex: 1 1 140px;
-      min-width: 140px;
+      flex: 1 1 110px;
+      min-width: 110px;
       max-width: 100%;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-      margin-bottom: 6px;
+      margin-bottom: 2px;
     }
     .results {
       background: #f1f3f6;
-      border-radius: 8px;
-      margin-top: 12px;
-      padding: 10px;
+      border-radius: 6px;
+      margin-top: 6px;
+      padding: 6px;
     }
     .results-table {
       width: 100%;
       border-collapse: collapse;
       margin: 0 auto;
       background: #fff;
-      border-radius: 8px;
+      border-radius: 6px;
       overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
     .results-table th, .results-table td {
-      padding: 7px 6px;
+      padding: 4px 3px;
       text-align: left;
       border-bottom: 1px solid #ececec;
-      font-size: 0.98em;
+      font-size: 0.94em;
     }
     .results-table th {
       background: #f8f9fa;
@@ -105,15 +106,15 @@
       background: #2d7ff9;
       color: #fff;
       border: none;
-      padding: 12px 0;
-      border-radius: 5px;
-      font-size: 1em;
+      padding: 8px 0;
+      border-radius: 4px;
+      font-size: 0.97em;
       cursor: pointer;
       width: 100%;
-      margin: 16px 0 0 0;
+      margin: 10px 0 0 0;
       font-weight: bold;
       letter-spacing: 1px;
-      box-shadow: 0 2px 6px rgba(44,127,249,0.07);
+      box-shadow: 0 2px 6px rgba(44,127,249,0.04);
       transition: background 0.2s;
     }
     button:disabled {
@@ -125,37 +126,41 @@
     }
     .error {
       color: red;
-      font-size: 0.95em;
+      font-size: 0.93em;
       text-align: center;
-      margin-top: 6px;
+      margin-top: 3px;
     }
     .dual-section {
       display: flex;
-      gap: 16px;
+      gap: 8px;
       flex-wrap: wrap;
     }
     .dual-col {
-      flex: 1 1 280px;
-      min-width: 220px;
-      margin-bottom: 8px;
+      flex: 1 1 180px;
+      min-width: 150px;
+      margin-bottom: 4px;
+    }
+    h3 {
+      font-size: 1em;
+      margin: 2px 0 3px 0;
+      color: #2d3e50;
     }
 
-    /* Responsive improvements for mobile */
-    @media (max-width: 900px) {
-      .container { padding: 12px 4px; }
-      .col { min-width: 100%; }
-      .dual-col { min-width: 100%; }
-      .dual-section { flex-direction: column; gap: 0; }
-    }
+    /* ULTRA COMPACT MOBILE LAYOUT */
     @media (max-width: 600px) {
+      .container { margin: 4px auto; padding: 2px 1px; }
+      h1 { font-size: 1.07em; margin-bottom: 4px; }
+      legend { font-size: 0.97em; margin-bottom: 2px; }
       .row, .button-row { flex-direction: column; gap: 0; }
-      .col { min-width: 100%; margin-bottom: 4px; }
-      .results-table th, .results-table td { font-size: 0.97em; padding: 6px 4px; }
-      fieldset { margin-bottom: 10px; }
-      legend { font-size: 1.05em; margin-bottom: 6px; }
-      .container { margin: 8px auto; padding: 4px 2px; }
-      button { padding: 10px 0; font-size: 0.97em; margin-top: 10px; }
-      .results { padding: 8px; }
+      .col, .dual-col { min-width: 100%; margin-bottom: 0; }
+      .dual-section { flex-direction: column; gap: 0; }
+      .results-table th, .results-table td { font-size: 0.93em; padding: 3px 2px; }
+      fieldset { margin-bottom: 5px; }
+      button { padding: 7px 0; font-size: 0.93em; margin-top: 7px; }
+      .results { padding: 4px; margin-top: 3px; }
+      input[type="number"], select { min-height: 24px; font-size: 0.94em; padding: 3px 4px; }
+      label { font-size: 0.94em; margin-bottom: 0; }
+      h3 { font-size: 0.98em; margin: 1px 0 2px 0; }
     }
   </style>
 </head>
@@ -283,7 +288,6 @@
       </fieldset>
     </form>
   </div>
-  <!-- Chatbase Chatbot Script -->
   <script>
     // ... (Unchanged JavaScript from your original file)
     const nf = new Intl.NumberFormat('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
