@@ -199,6 +199,7 @@
               <tr><th>Weight each</th><td id="weightEachKg"></td></tr>
               <tr><th>Total weight</th><td id="totalWeight"></td></tr>
               <tr><th>Total meters</th><td id="totalMeters"></td></tr>
+              <tr id="qtyRow" style="display:none;"><th>Qty</th><td id="qtyResult"></td></tr>
               <tr><th>Total tons</th><td id="totalTons"></td></tr>
             </tbody>
           </table>
@@ -291,6 +292,8 @@
     const quantityInput = document.getElementById('quantity');
     const lengthInput = document.getElementById('lengthM');
     const totalTonInput = document.getElementById('totalTonInput');
+    const qtyRow = document.getElementById('qtyRow');
+    const qtyResult = document.getElementById('qtyResult');
 
     function updateShapeInfo() {
       const selectedShape = shapeSelect.value;
@@ -298,10 +301,8 @@
       densityInput.value = config.density;
 
       if (selectedShape === 'coil') {
-        // Show length input and total ton input
         lengthCol.style.display = 'block';
         tonCol.style.display = 'block';
-        // Make quantity readonly, will calculate automatically
         quantityInput.readOnly = true;
       } else if (config.method === 'length') {
         lengthCol.style.display = 'block';
@@ -329,31 +330,36 @@
         let totalMeters, totalTons, weightEachKg, quantity;
 
         if (selectedShape === 'coil') {
-          // For coil, user inputs Length and Total Weight (tons)
           const lengthM = parseFloat(lengthInput.value);
           const totalTon = parseFloat(totalTonInput.value);
           if (!lengthM || lengthM <= 0 || !totalTon || totalTon <= 0) {
             quantityInput.value = '';
+            qtyRow.style.display = "none";
             document.getElementById('weightResults').style.display = "none";
             return;
           }
-          totalMeters = (totalTon * 1000) / kgPerM; // total meters from total weight
-          quantity = totalMeters / lengthM; // Qty = total meters / length
+          totalMeters = (totalTon * 1000) / kgPerM;
+          quantity = totalMeters / lengthM;
           quantityInput.value = quantity.toFixed(2);
           weightEachKg = kgPerM * lengthM;
+          qtyResult.textContent = nf.format(quantity);
+          qtyRow.style.display = "";
         } else if (isLengthMode) {
-          // For sheet and plate
           const lengthM = parseFloat(lengthInput.value);
           quantity = parseFloat(quantityInput.value) || 1;
-          if (!lengthM || lengthM <= 0) return;
+          if (!lengthM || lengthM <= 0) {
+            qtyRow.style.display = "none";
+            return;
+          }
           totalMeters = lengthM * quantity;
           weightEachKg = kgPerM * lengthM;
+          qtyRow.style.display = "none";
         } else {
-          // For slitcoil or other weight mode
           const totalTon = parseFloat(totalTonInput.value);
           quantity = parseFloat(quantityInput.value) || 1;
           totalMeters = (totalTon * 1000) / kgPerM;
           weightEachKg = '-';
+          qtyRow.style.display = "none";
         }
 
         const totalWeight = isLengthMode ? weightEachKg * quantity : parseFloat(totalTonInput.value) * 1000;
@@ -443,6 +449,7 @@
       document.querySelectorAll('.results').forEach(el => el.style.display = "none");
       document.querySelectorAll('.error').forEach(el => el.textContent = "");
       quantityInput.readOnly = false;
+      qtyRow.style.display = "none";
     });
 
     window.addEventListener('DOMContentLoaded', () => {
