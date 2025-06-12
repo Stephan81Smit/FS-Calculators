@@ -108,16 +108,6 @@
       flex: 1 1 380px;
       min-width: 320px;
     }
-    .toggle-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 8px;
-    }
-    .toggle-row label {
-      margin: 0 8px 0 0;
-      font-weight: 400;
-    }
     .error {
       color: red;
       font-size: 0.95em;
@@ -219,31 +209,22 @@
           <!-- Cost to Selling -->
           <div class="dual-col">
             <h3>Cost to Selling</h3>
-            <div class="toggle-row">
-              <label><input type="radio" name="cost_mode" value="ton" checked> Enter Cost per Ton</label>
-              <label><input type="radio" name="cost_mode" value="item"> Enter Cost per Item</label>
-            </div>
             <div class="row">
-              <div class="col" id="costPerTonCol">
+              <div class="col">
                 <label for="cost_pricePerTon">Cost Price (R/ton)</label>
-                <input type="number" id="cost_pricePerTon" value="20000" min="0.01" step="0.01" />
-              </div>
-              <div class="col" id="costPerItemCol" style="display:none;">
-                <label for="cost_pricePerItem">Cost Price (R/item)</label>
-                <input type="number" id="cost_pricePerItem" value="93.32" min="0.01" step="0.01" />
+                <input type="number" id="cost_pricePerTon" value="4800" min="0.01" step="0.01" />
               </div>
               <div class="col">
                 <label for="cost_weightEach">Weight Each (kg)</label>
-                <input type="number" id="cost_weightEach" value="4.66" min="0.01" step="0.01" />
+                <input type="number" id="cost_weightEach" value="10" min="0.01" step="0.01" />
               </div>
               <div class="col">
                 <label for="cost_gp">GP %</label>
-                <input type="number" id="cost_gp" value="25" min="0" max="99.99" step="0.1" />
+                <input type="number" id="cost_gp" value="20" min="0" max="99.99" step="0.1" />
               </div>
             </div>
             <div class="results" id="costToSellingResults" style="display:none;">
-              <div class="result-item" id="costToSelling_costPerItemRow"><span class="result-label">Cost per Item:</span> <span id="costToSelling_costPerItem"></span></div>
-              <div class="result-item" id="costToSelling_costPerTonRow"><span class="result-label">Cost per Ton:</span> <span id="costToSelling_costPerTon"></span></div>
+              <div class="result-item"><span class="result-label">Cost per Item:</span> <span id="costToSelling_costPerItem"></span></div>
               <div class="result-item"><span class="result-label">Selling Price per Item:</span> <span id="costToSelling_sellingPerItem"></span></div>
               <div class="result-item"><span class="result-label">Selling Price per Ton:</span> <span id="costToSelling_sellingPerTon"></span></div>
               <div class="result-item"><span class="result-label">Gross Profit per Item:</span> <span id="costToSelling_gpPerItem"></span></div>
@@ -253,31 +234,22 @@
           <!-- Selling to Cost -->
           <div class="dual-col">
             <h3>Selling to Cost</h3>
-            <div class="toggle-row">
-              <label><input type="radio" name="sell_mode" value="ton" checked> Enter Selling Price per Ton</label>
-              <label><input type="radio" name="sell_mode" value="item"> Enter Selling Price per Item</label>
-            </div>
             <div class="row">
-              <div class="col" id="sellPerTonCol">
+              <div class="col">
                 <label for="sell_sellingPerTon">Selling Price (R/ton)</label>
-                <input type="number" id="sell_sellingPerTon" value="26667" min="0.01" step="0.01" />
-              </div>
-              <div class="col" id="sellPerItemCol" style="display:none;">
-                <label for="sell_sellingPerItem">Selling Price (R/item)</label>
-                <input type="number" id="sell_sellingPerItem" value="124.43" min="0.01" step="0.01" />
+                <input type="number" id="sell_sellingPerTon" value="20408.16" min="0.01" step="0.01" />
               </div>
               <div class="col">
                 <label for="sell_weightEach">Weight Each (kg)</label>
-                <input type="number" id="sell_weightEach" value="4.66" min="0.01" step="0.01" />
+                <input type="number" id="sell_weightEach" value="2.94" min="0.01" step="0.01" />
               </div>
               <div class="col">
                 <label for="sell_gp">GP %</label>
-                <input type="number" id="sell_gp" value="25" min="0" max="99.99" step="0.1" />
+                <input type="number" id="sell_gp" value="20" min="0" max="99.99" step="0.1" />
               </div>
             </div>
             <div class="results" id="sellingToCostResults" style="display:none;">
-              <div class="result-item" id="sellingToCost_sellingPerItemRow"><span class="result-label">Selling Price per Item:</span> <span id="sellingToCost_sellingPerItem"></span></div>
-              <div class="result-item" id="sellingToCost_sellingPerTonRow"><span class="result-label">Selling Price per Ton:</span> <span id="sellingToCost_sellingPerTon"></span></div>
+              <div class="result-item"><span class="result-label">Selling Price per Item:</span> <span id="sellingToCost_sellingPerItem"></span></div>
               <div class="result-item"><span class="result-label">Cost per Item:</span> <span id="sellingToCost_costPerItem"></span></div>
               <div class="result-item"><span class="result-label">Cost per Ton:</span> <span id="sellingToCost_costPerTon"></span></div>
               <div class="result-item"><span class="result-label">Gross Profit per Item:</span> <span id="sellingToCost_gpPerItem"></span></div>
@@ -385,129 +357,72 @@
         document.getElementById('totalMeters').textContent = nf.format(totalMeters) + " m";
         document.getElementById('totalTons').textContent = nf.format(totalTons) + " tons";
         document.getElementById('weightResults').style.display = "block";
-
-        // Update cost and selling weightEach inputs
-        if (weightEachKg !== '-') {
-          document.getElementById('cost_weightEach').value = weightEachKg.toFixed(2);
-          document.getElementById('sell_weightEach').value = weightEachKg.toFixed(2);
-        }
       } catch(err) {
         document.getElementById('weightError').textContent = "Error in calculation";
       }
     }
 
-    // --- Cost to Selling Toggle Logic ---
-    function updateCostMode() {
-      const mode = document.querySelector('input[name="cost_mode"]:checked').value;
-      document.getElementById('costPerTonCol').style.display = (mode === 'ton') ? '' : 'none';
-      document.getElementById('costPerItemCol').style.display = (mode === 'item') ? '' : 'none';
-      document.getElementById('costToSelling_costPerItemRow').style.display = (mode === 'ton') ? '' : 'none';
-      document.getElementById('costToSelling_costPerTonRow').style.display = (mode === 'item') ? '' : 'none';
-      calculateCostToSelling();
-    }
-
-    // --- Selling to Cost Toggle Logic ---
-    function updateSellMode() {
-      const mode = document.querySelector('input[name="sell_mode"]:checked').value;
-      document.getElementById('sellPerTonCol').style.display = (mode === 'ton') ? '' : 'none';
-      document.getElementById('sellPerItemCol').style.display = (mode === 'item') ? '' : 'none';
-      document.getElementById('sellingToCost_sellingPerItemRow').style.display = (mode === 'ton') ? '' : 'none';
-      document.getElementById('sellingToCost_sellingPerTonRow').style.display = (mode === 'item') ? '' : 'none';
-      calculateSellingToCost();
-    }
-
-    // --- Cost to Selling Calculation ---
     function calculateCostToSelling() {
-      const mode = document.querySelector('input[name="cost_mode"]:checked').value;
-      let pricePerTon, pricePerItem;
+      const pricePerTon = parseFloat(document.getElementById('cost_pricePerTon').value);
       const weightEach = parseFloat(document.getElementById('cost_weightEach').value);
       const gp = parseFloat(document.getElementById('cost_gp').value);
 
-      if (mode === 'ton') {
-        pricePerTon = parseFloat(document.getElementById('cost_pricePerTon').value);
-        if (!pricePerTon || !weightEach || gp >= 100) return;
-        pricePerItem = pricePerTon / 1000 * weightEach;
-        document.getElementById('costToSelling_costPerItem').textContent = "R " + nf.format(pricePerItem);
-        document.getElementById('costToSelling_costPerTon').textContent = "R " + nf.format(pricePerTon);
-      } else {
-        pricePerItem = parseFloat(document.getElementById('cost_pricePerItem').value);
-        if (!pricePerItem || !weightEach || gp >= 100) return;
-        pricePerTon = pricePerItem / weightEach * 1000;
-        document.getElementById('costToSelling_costPerTon').textContent = "R " + nf.format(pricePerTon);
-        document.getElementById('costToSelling_costPerItem').textContent = "R " + nf.format(pricePerItem);
-      }
+      if (!pricePerTon || !weightEach || gp >= 100) return;
 
-      const sellingPerItem = pricePerItem / (1 - gp/100);
-      const sellingPerTon = pricePerTon / (1 - gp/100);
-      const gpPerItem = sellingPerItem - pricePerItem;
+      const pricePerKg = pricePerTon / 1000;
+      const costPerItem = pricePerKg * weightEach;
+      const sellingPerItem = costPerItem / (1 - gp/100);
+      const sellingPerTon = sellingPerItem / weightEach * 1000;
+      const gpPerItem = sellingPerItem - costPerItem;
 
+      document.getElementById('costToSelling_costPerItem').textContent = "R " + nf.format(costPerItem);
       document.getElementById('costToSelling_sellingPerItem').textContent = "R " + nf.format(sellingPerItem);
       document.getElementById('costToSelling_sellingPerTon').textContent = "R " + nf.format(sellingPerTon);
       document.getElementById('costToSelling_gpPerItem').textContent = "R " + nf.format(gpPerItem);
       document.getElementById('costToSellingResults').style.display = "block";
     }
-
-    // --- Selling to Cost Calculation ---
     function calculateSellingToCost() {
-      const mode = document.querySelector('input[name="sell_mode"]:checked').value;
-      let sellingPerTon, sellingPerItem;
+      const sellingPerTon = parseFloat(document.getElementById('sell_sellingPerTon').value);
       const weightEach = parseFloat(document.getElementById('sell_weightEach').value);
       const gp = parseFloat(document.getElementById('sell_gp').value);
 
-      if (mode === 'ton') {
-        sellingPerTon = parseFloat(document.getElementById('sell_sellingPerTon').value);
-        if (!sellingPerTon || !weightEach || gp >= 100) return;
-        sellingPerItem = sellingPerTon / 1000 * weightEach;
-        document.getElementById('sellingToCost_sellingPerItem').textContent = "R " + nf.format(sellingPerItem);
-        document.getElementById('sellingToCost_sellingPerTon').textContent = "R " + nf.format(sellingPerTon);
-      } else {
-        sellingPerItem = parseFloat(document.getElementById('sell_sellingPerItem').value);
-        if (!sellingPerItem || !weightEach || gp >= 100) return;
-        sellingPerTon = sellingPerItem / weightEach * 1000;
-        document.getElementById('sellingToCost_sellingPerTon').textContent = "R " + nf.format(sellingPerTon);
-        document.getElementById('sellingToCost_sellingPerItem').textContent = "R " + nf.format(sellingPerItem);
-      }
+      if (!sellingPerTon || !weightEach || gp >= 100) return;
 
+      const sellingPerKg = sellingPerTon / 1000;
+      const sellingPerItem = sellingPerKg * weightEach;
       const costPerItem = sellingPerItem * (1 - gp/100);
-      const costPerTon = sellingPerTon * (1 - gp/100);
+      const costPerTon = costPerItem / weightEach * 1000;
       const gpPerItem = sellingPerItem - costPerItem;
 
+      document.getElementById('sellingToCost_sellingPerItem').textContent = "R " + nf.format(sellingPerItem);
       document.getElementById('sellingToCost_costPerItem').textContent = "R " + nf.format(costPerItem);
       document.getElementById('sellingToCost_costPerTon').textContent = "R " + nf.format(costPerTon);
       document.getElementById('sellingToCost_gpPerItem').textContent = "R " + nf.format(gpPerItem);
       document.getElementById('sellingToCostResults').style.display = "block";
     }
 
-    // --- Event Listeners ---
+    // Attach event listeners for all relevant inputs
     shapeSelect.addEventListener("change", () => {
       updateShapeInfo();
       calculateWeight();
-      updateCostMode();
-      updateSellMode();
+      calculateCostToSelling();
+      calculateSellingToCost();
     });
 
     ["width", "thickness", "lengthM", "totalTonInput", "quantity", "density"].forEach(id => {
       document.getElementById(id).addEventListener("input", () => {
         calculateWeight();
-        updateCostMode();
-        updateSellMode();
+        calculateCostToSelling();
+        calculateSellingToCost();
       });
     });
 
-    // Cost to Selling toggle and inputs
-    document.querySelectorAll('input[name="cost_mode"]').forEach(radio => {
-      radio.addEventListener('change', updateCostMode);
-    });
-    ["cost_pricePerTon", "cost_pricePerItem", "cost_weightEach", "cost_gp"].forEach(id => {
-      document.getElementById(id).addEventListener("input", updateCostMode);
+    ["cost_pricePerTon", "cost_weightEach", "cost_gp"].forEach(id => {
+      document.getElementById(id).addEventListener("input", calculateCostToSelling);
     });
 
-    // Selling to Cost toggle and inputs
-    document.querySelectorAll('input[name="sell_mode"]').forEach(radio => {
-      radio.addEventListener('change', updateSellMode);
-    });
-    ["sell_sellingPerTon", "sell_sellingPerItem", "sell_weightEach", "sell_gp"].forEach(id => {
-      document.getElementById(id).addEventListener("input", updateSellMode);
+    ["sell_sellingPerTon", "sell_weightEach", "sell_gp"].forEach(id => {
+      document.getElementById(id).addEventListener("input", calculateSellingToCost);
     });
 
     document.getElementById("resetBtn").addEventListener("click", () => {
@@ -515,18 +430,13 @@
       document.querySelectorAll('.error').forEach(el => el.textContent = "");
       quantityInput.readOnly = false;
       qtyRow.style.display = "none";
-      // Reset toggles to default
-      document.querySelector('input[name="cost_mode"][value="ton"]').checked = true;
-      document.querySelector('input[name="sell_mode"][value="ton"]').checked = true;
-      updateCostMode();
-      updateSellMode();
     });
 
     window.addEventListener('DOMContentLoaded', () => {
       updateShapeInfo();
       calculateWeight();
-      updateCostMode();
-      updateSellMode();
+      calculateCostToSelling();
+      calculateSellingToCost();
     });
   </script>
 </body>
