@@ -138,11 +138,9 @@
       border-color: #27ae60 !important;
       box-shadow: 0 0 5px rgba(39,174,96,0.5);
     }
-    /* Hide only the input and label for Weight per meter/each fields in Pricing Calculators */
     .hidden-field {
       display: none !important;
     }
-    /* Responsive */
     @media (max-width: 600px) {
       .container {
         padding: 12px;
@@ -171,7 +169,6 @@
         font-size: 1.2em;
       }
     }
-    /* Ensure error spans do not break layout */
     .input-group {
       position: relative;
       margin-bottom: 12px;
@@ -264,8 +261,8 @@
           <div class="dual-col">
             <h3>Cost to Selling</h3>
             <div class="toggle-row" role="radiogroup" aria-label="Cost to Selling input mode">
-              <label><input type="radio" name="cost_mode" value="ton" checked tabindex="8" /> Enter Cost per Ton</label>
-              <label><input type="radio" name="cost_mode" value="item" tabindex="9" /> Enter Cost per Item</label>
+              <label><input type="radio" name="cost_mode" value="ton" checked tabindex="8" /> Enter Cost (R/ton)</label>
+              <label><input type="radio" name="cost_mode" value="item" tabindex="9" /> Enter Cost (each)</label>
             </div>
             <div class="row">
               <div class="col" id="costPerTonCol">
@@ -282,7 +279,6 @@
                   <span class="error-message" id="cost_pricePerItemError"></span>
                 </div>
               </div>
-              <!-- Hidden weightEach field -->
               <div class="col">
                 <div class="input-group">
                   <label for="cost_weightEach" class="hidden-field">Weight per Item (kg)</label>
@@ -310,8 +306,8 @@
           <div class="dual-col">
             <h3>Selling to Cost</h3>
             <div class="toggle-row" role="radiogroup" aria-label="Selling to Cost input mode">
-              <label><input type="radio" name="sell_mode" value="ton" checked tabindex="13" /> Enter Selling Price per Ton</label>
-              <label><input type="radio" name="sell_mode" value="item" tabindex="14" /> Enter Selling Price per Item</label>
+              <label><input type="radio" name="sell_mode" value="ton" checked tabindex="13" /> Enter Selling (R/ton)</label>
+              <label><input type="radio" name="sell_mode" value="item" tabindex="14" /> Enter Selling (each)</label>
             </div>
             <div class="row">
               <div class="col" id="sellPerTonCol">
@@ -328,7 +324,6 @@
                   <span class="error-message" id="sell_sellingPerItemError"></span>
                 </div>
               </div>
-              <!-- Hidden weightEach field -->
               <div class="col">
                 <div class="input-group">
                   <label for="sell_weightEach" class="hidden-field">Weight per Item (kg)</label>
@@ -356,7 +351,6 @@
       </div>
     </form>
   </div>
-
   <script>
     // Utility function for rounding
     function round(num, decimals = 2) {
