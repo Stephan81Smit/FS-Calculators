@@ -5,8 +5,6 @@
   <title>Freestock Calculators</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    html { box-sizing: border-box; }
-    *, *:before, *:after { box-sizing: inherit; }
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
       background: #f8f9fa;
@@ -14,7 +12,7 @@
       padding: 0;
     }
     .container {
-      max-width: 900px;
+      max-width: 800px;
       margin: 40px auto;
       background: #fff;
       border-radius: 10px;
@@ -26,48 +24,45 @@
       color: #2d3e50;
       margin-bottom: 10px;
     }
-    fieldset {
-      border: none;
-      padding: 0;
-      margin: 0 0 32px;
+    .instructions {
+      text-align: center;
+      color: #444;
+      margin-bottom: 28px;
     }
-    legend {
-      font-size: 1.5em;
+    h2 {
       color: #1b5fc6;
       border-bottom: 1px solid #eee;
       padding-bottom: 4px;
-      margin-bottom: 16px;
-      display: block;
+    }
+    h3 {
+      color: #2d3e50;
+      margin-bottom: 10px;
+      margin-top: 0;
+      font-size: 1.1em;
+      font-weight: 600;
+    }
+    .segment {
+      margin-bottom: 32px;
     }
     label {
       display: block;
-      margin-bottom: 4px;
+      margin: 12px 0 6px;
       font-weight: 600;
-      font-size: 1em;
-      word-break: break-word;
     }
     input[type="number"], select {
       width: 100%;
-      padding: 8px;
-      font-size: 1em;
+      padding: 12px;
+      font-size: 1.1em;
       border: 1px solid #ccc;
       border-radius: 4px;
-      margin-bottom: 8px;
       box-sizing: border-box;
     }
     .row {
       display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 0;
+      gap: 16px;
     }
     .col {
-      flex: 1 1 180px;
-      min-width: 180px;
-      max-width: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
+      flex: 1;
     }
     .results {
       background: #f1f3f6;
@@ -75,37 +70,20 @@
       margin-top: 18px;
       padding: 18px;
     }
-    .results-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 0 auto;
-      background: #fff;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    .result-item {
+      margin: 8px 0;
     }
-    .results-table th, .results-table td {
-      padding: 10px 8px;
-      text-align: left;
-      border-bottom: 1px solid #ececec;
-      font-size: 1em;
-    }
-    .results-table th {
-      background: #f8f9fa;
-      font-weight: 600;
-      color: #1b5fc6;
-    }
-    .results-table tr:last-child td {
-      border-bottom: none;
+    .result-label {
+      font-weight: 500;
     }
     button {
       display: block;
       background: #2d7ff9;
       color: #fff;
       border: none;
-      padding: 16px 0;
+      padding: 18px 0;
       border-radius: 5px;
-      font-size: 1.1em;
+      font-size: 1.2em;
       cursor: pointer;
       width: 100%;
       margin: 24px 0 0 0;
@@ -114,18 +92,12 @@
       box-shadow: 0 2px 6px rgba(44,127,249,0.07);
       transition: background 0.2s;
     }
-    button:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-    button:hover:enabled {
+    button:hover {
       background: #1b5fc6;
     }
-    .error {
-      color: red;
-      font-size: 0.95em;
-      text-align: center;
-      margin-top: 10px;
+    .button-row {
+      display: flex;
+      gap: 16px;
     }
     .dual-section {
       display: flex;
@@ -136,115 +108,53 @@
       flex: 1 1 380px;
       min-width: 320px;
     }
-    @media (max-width: 900px) {
-      .col { min-width: 100%; }
-      .dual-col { min-width: 100%; }
-      .dual-section { flex-direction: column; gap: 0; }
+    .error {
+      color: red;
+      font-size: 0.95em;
+      text-align: center;
+      margin-top: 10px;
     }
-    @media (max-width: 600px) {
-      .row, .button-row { flex-direction: column; gap: 0; }
-      .col { min-width: 100%; }
-      .results-table th, .results-table td { font-size: 1em; }
-    }
-
-    /* --- MOBILE IMPROVEMENTS BELOW --- */
     @media (max-width: 600px) {
       .container {
-        padding: 8px;
-        border-radius: 0;
-        margin: 0;
-        box-shadow: none;
-        max-width: 100vw;
+        padding: 12px;
       }
-      .row,
-      .dual-section {
-        flex-direction: column !important;
-        gap: 0 !important;
+      .row, .button-row, .dual-section {
+        flex-direction: column;
+        gap: 0;
       }
-      .col,
-      .dual-col {
-        min-width: 100% !important;
-        width: 100% !important;
-        margin-bottom: 14px !important;
+      .col, .dual-col {
+        min-width: 100%;
+        width: 100%;
+        margin-bottom: 14px;
       }
-      label {
-        padding: 0 0 4px 0;
+      input[type="number"], select {
         font-size: 1em;
-      }
-      input[type="number"],
-      select {
-        font-size: 1.1em;
-        padding: 16px 10px;
-        min-height: 44px;
-        margin-bottom: 12px;
+        padding: 16px 8px;
       }
       button {
-        padding: 18px 0;
-        font-size: 1.2em;
-        margin-top: 18px;
-        min-height: 48px;
+        font-size: 1em;
+        padding: 16px 0;
       }
       h1 {
-        font-size: 1.3em;
-        margin-bottom: 8px;
+        font-size: 1.6em;
       }
-      legend {
-        font-size: 1.1em;
-        margin-bottom: 8px;
-      }
-      .results {
-        padding: 10px 2px;
-        margin-top: 10px;
-      }
-      /* Responsive table: convert to block/cards */
-      .results-table,
-      .results-table thead,
-      .results-table tbody,
-      .results-table tr,
-      .results-table th,
-      .results-table td {
-        display: block;
-        width: 100%;
-      }
-      .results-table tr {
-        margin-bottom: 12px;
-        border: 1px solid #ececec;
-        border-radius: 6px;
-        background: #fff;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-        padding: 8px 4px;
-      }
-      .results-table th {
-        background: none;
-        color: #1b5fc6;
-        font-weight: 600;
-        padding: 6px 4px 2px 4px;
-        border-bottom: none;
-        font-size: 1em;
-      }
-      .results-table td {
-        padding: 2px 4px 10px 4px;
-        font-size: 1em;
-        border-bottom: none;
-      }
-      .results-table tr:last-child {
-        margin-bottom: 0;
-      }
-      /* Hide table header row if present */
-      .results-table thead {
-        display: none;
+      h2 {
+        font-size: 1.2em;
       }
     }
-    /* --- END MOBILE IMPROVEMENTS --- */
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Freestock Calculators</h1>
-    <!-- Product Dimensions Section -->
+    <div class="instructions">
+      Enter your values in the input fields below.<br>
+      All results update automatically.
+    </div>
     <form id="calcForm" autocomplete="off" onsubmit="return false;">
-      <fieldset>
-        <legend>Product Dimensions</legend>
+      <!-- Product Dimensions Segment -->
+      <div class="segment">
+        <h2>Product Dimensions</h2>
         <div class="row">
           <div class="col">
             <label for="shapeSelect">Product Shape</label>
@@ -283,22 +193,18 @@
           </div>
         </div>
         <div class="results" id="weightResults" style="display:none;">
-          <table class="results-table">
-            <tbody>
-              <tr><th>Weight per meter</th><td id="kgPerM"></td></tr>
-              <tr><th>Weight each</th><td id="weightEachKg"></td></tr>
-              <tr><th>Total weight</th><td id="totalWeight"></td></tr>
-              <tr><th>Total meters</th><td id="totalMeters"></td></tr>
-              <tr id="qtyRow" style="display:none;"><th>Qty</th><td id="qtyResult"></td></tr>
-              <tr><th>Total tons</th><td id="totalTons"></td></tr>
-            </tbody>
-          </table>
+          <div class="result-item"><span class="result-label">Weight per meter:</span> <span id="kgPerM"></span></div>
+          <div class="result-item"><span class="result-label">Weight each:</span> <span id="weightEachKg"></span></div>
+          <div class="result-item"><span class="result-label">Total weight:</span> <span id="totalWeight"></span></div>
+          <div class="result-item"><span class="result-label">Total meters:</span> <span id="totalMeters"></span></div>
+          <div class="result-item" id="qtyRow" style="display:none;"><span class="result-label">Qty:</span> <span id="qtyResult"></span></div>
+          <div class="result-item"><span class="result-label">Total tons:</span> <span id="totalTons"></span></div>
         </div>
         <div class="error" id="weightError"></div>
-      </fieldset>
-      <!-- Dual Pricing Calculators -->
-      <fieldset>
-        <legend>Pricing Calculators</legend>
+      </div>
+      <!-- Pricing Calculators Segment -->
+      <div class="segment">
+        <h2>Pricing Calculators</h2>
         <div class="dual-section">
           <!-- Cost to Selling -->
           <div class="dual-col">
@@ -318,234 +224,10 @@
               </div>
             </div>
             <div class="results" id="costToSellingResults" style="display:none;">
-              <table class="results-table">
-                <tbody>
-                  <tr><th>Cost per Item</th><td id="costToSelling_costPerItem"></td></tr>
-                  <tr><th>Selling Price per Item</th><td id="costToSelling_sellingPerItem"></td></tr>
-                  <tr><th>Selling Price per kg</th><td id="costToSelling_sellingPerKg"></td></tr>
-                  <tr><th>Gross Profit per Item</th><td id="costToSelling_gpPerItem"></td></tr>
-                </tbody>
-              </table>
+              <div class="result-item"><span class="result-label">Cost per Item:</span> <span id="costToSelling_costPerItem"></span></div>
+              <div class="result-item"><span class="result-label">Selling Price per Item:</span> <span id="costToSelling_sellingPerItem"></span></div>
+              <div class="result-item"><span class="result-label">Selling Price per kg:</span> <span id="costToSelling_sellingPerKg"></span></div>
+              <div class="result-item"><span class="result-label">Gross Profit per Item:</span> <span id="costToSelling_gpPerItem"></span></div>
             </div>
-            <div class="error" id="costToSellingError"></div>
-          </div>
-          <!-- Selling to Cost -->
-          <div class="dual-col">
-            <h3>Selling to Cost</h3>
-            <div class="row">
-              <div class="col">
-                <label for="sell_sellingPerTon">Selling Price (R/ton)</label>
-                <input type="number" id="sell_sellingPerTon" value="26667" min="0.01" step="0.01" />
-              </div>
-              <div class="col">
-                <label for="sell_weightEach">Weight Each (kg)</label>
-                <input type="number" id="sell_weightEach" value="4.66" min="0.01" step="0.01" />
-              </div>
-              <div class="col">
-                <label for="sell_gp">GP %</label>
-                <input type="number" id="sell_gp" value="25" min="0" max="99.99" step="0.1" />
-              </div>
-            </div>
-            <div class="results" id="sellingToCostResults" style="display:none;">
-              <table class="results-table">
-                <tbody>
-                  <tr><th>Selling Price per Item</th><td id="sellingToCost_sellingPerItem"></td></tr>
-                  <tr><th>Cost per Item</th><td id="sellingToCost_costPerItem"></td></tr>
-                  <tr><th>Cost Price per kg</th><td id="sellingToCost_costPerKg"></td></tr>
-                  <tr><th>Gross Profit per Item</th><td id="sellingToCost_gpPerItem"></td></tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="error" id="sellingToCostError"></div>
-          </div>
-        </div>
-        <button type="reset" id="resetBtn">Reset All</button>
-      </fieldset>
-    </form>
-  </div>
-  <script>
-    // Number formatting for 2 decimals
-    const nf = new Intl.NumberFormat('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            <
 
-    // Shape configuration data
-    const shapeConfig = {
-      sheet: { method: 'length', density: 8.039, name: 'Sheet' },
-      plate: { method: 'length', density: 7.85, name: 'Plate' },
-      coil: { method: 'weight', density: 8.039, name: 'Coil' },
-      slitcoil: { method: 'weight', density: 8.039, name: 'Slit Coil' }
-    };
-
-    const shapeSelect = document.getElementById("shapeSelect");
-    const densityInput = document.getElementById("density");
-    const lengthCol = document.getElementById('lengthCol');
-    const tonCol = document.getElementById('tonCol');
-    const quantityInput = document.getElementById('quantity');
-    const lengthInput = document.getElementById('lengthM');
-    const totalTonInput = document.getElementById('totalTonInput');
-    const qtyRow = document.getElementById('qtyRow');
-    const qtyResult = document.getElementById('qtyResult');
-
-    function updateShapeInfo() {
-      const selectedShape = shapeSelect.value;
-      const config = shapeConfig[selectedShape];
-      densityInput.value = config.density;
-
-      if (selectedShape === 'coil') {
-        lengthCol.style.display = 'block';
-        tonCol.style.display = 'block';
-        quantityInput.readOnly = true;
-      } else if (config.method === 'length') {
-        lengthCol.style.display = 'block';
-        tonCol.style.display = 'none';
-        quantityInput.readOnly = false;
-      } else {
-        lengthCol.style.display = 'none';
-        tonCol.style.display = 'block';
-        quantityInput.readOnly = false;
-      }
-      calculateWeight();
-    }
-
-    function calculateWeight() {
-      try {
-        const width = parseFloat(document.getElementById('width').value) / 1000;
-        const thickness = parseFloat(document.getElementById('thickness').value) / 1000;
-        const density = parseFloat(densityInput.value) * 1000; // Convert g/cm³ to kg/m³
-        const selectedShape = shapeSelect.value;
-        const isLengthMode = shapeConfig[selectedShape].method === 'length';
-        if (!width || !thickness || !density) return;
-
-        const kgPerM = width * thickness * density;
-        let totalMeters, totalTons, weightEachKg, quantity;
-
-        if (selectedShape === 'coil') {
-          const lengthM = parseFloat(lengthInput.value);
-          const totalTon = parseFloat(totalTonInput.value);
-          if (!lengthM || lengthM <= 0 || !totalTon || totalTon <= 0) {
-            quantityInput.value = '';
-            qtyRow.style.display = "none";
-            document.getElementById('weightResults').style.display = "none";
-            return;
-          }
-          totalMeters = (totalTon * 1000) / kgPerM;
-          quantity = totalMeters / lengthM;
-          quantityInput.value = quantity.toFixed(2);
-          weightEachKg = kgPerM * lengthM;
-          qtyResult.textContent = nf.format(quantity);
-          qtyRow.style.display = "";
-        } else if (isLengthMode) {
-          const lengthM = parseFloat(lengthInput.value);
-          quantity = parseFloat(quantityInput.value) || 1;
-          if (!lengthM || lengthM <= 0) {
-            qtyRow.style.display = "none";
-            return;
-          }
-          totalMeters = lengthM * quantity;
-          weightEachKg = kgPerM * lengthM;
-          qtyRow.style.display = "none";
-        } else {
-          const totalTon = parseFloat(totalTonInput.value);
-          quantity = parseFloat(quantityInput.value) || 1;
-          totalMeters = (totalTon * 1000) / kgPerM;
-          weightEachKg = '-';
-          qtyRow.style.display = "none";
-        }
-
-        const totalWeight = isLengthMode ? weightEachKg * quantity : parseFloat(totalTonInput.value) * 1000;
-        totalTons = totalWeight / 1000;
-
-        document.getElementById('kgPerM').textContent = nf.format(kgPerM) + " kg/m";
-        document.getElementById('weightEachKg').textContent = (weightEachKg === '-' ? '-' : nf.format(weightEachKg) + " kg");
-        document.getElementById('totalWeight').textContent = nf.format(totalWeight) + " kg";
-        document.getElementById('totalMeters').textContent = nf.format(totalMeters) + " m";
-        document.getElementById('totalTons').textContent = nf.format(totalTons) + " tons";
-        document.getElementById('weightResults').style.display = "block";
-
-        // Update cost and selling weightEach inputs
-        if (weightEachKg !== '-') {
-          document.getElementById('cost_weightEach').value = weightEachKg.toFixed(2);
-          document.getElementById('sell_weightEach').value = weightEachKg.toFixed(2);
-        }
-      } catch(err) {
-        document.getElementById('weightError').textContent = "Error in calculation";
-      }
-    }
-
-    function calculateCostToSelling() {
-      const pricePerTon = parseFloat(document.getElementById('cost_pricePerTon').value);
-      const weightEach = parseFloat(document.getElementById('cost_weightEach').value);
-      const gp = parseFloat(document.getElementById('cost_gp').value);
-
-      if (!pricePerTon || !weightEach || gp >= 100) return;
-
-      const pricePerKg = pricePerTon / 1000;
-      const costPerItem = pricePerKg * weightEach;
-      const sellingPerItem = costPerItem / (1 - gp/100);
-      const sellingPerKg = sellingPerItem / weightEach;
-      const gpPerItem = sellingPerItem - costPerItem;
-
-      document.getElementById('costToSelling_costPerItem').textContent = "R " + nf.format(costPerItem);
-      document.getElementById('costToSelling_sellingPerItem').textContent = "R " + nf.format(sellingPerItem);
-      document.getElementById('costToSelling_sellingPerKg').textContent = "R " + nf.format(sellingPerKg);
-      document.getElementById('costToSelling_gpPerItem').textContent = "R " + nf.format(gpPerItem);
-      document.getElementById('costToSellingResults').style.display = "block";
-    }
-    function calculateSellingToCost() {
-      const sellingPerTon = parseFloat(document.getElementById('sell_sellingPerTon').value);
-      const weightEach = parseFloat(document.getElementById('sell_weightEach').value);
-      const gp = parseFloat(document.getElementById('sell_gp').value);
-
-      if (!sellingPerTon || !weightEach || gp >= 100) return;
-
-      const sellingPerKg = sellingPerTon / 1000;
-      const sellingPerItem = sellingPerKg * weightEach;
-      const costPerItem = sellingPerItem * (1 - gp/100);
-      const costPerKg = costPerItem / weightEach;
-      const gpPerItem = sellingPerItem - costPerItem;
-
-      document.getElementById('sellingToCost_sellingPerItem').textContent = "R " + nf.format(sellingPerItem);
-      document.getElementById('sellingToCost_costPerItem').textContent = "R " + nf.format(costPerItem);
-      document.getElementById('sellingToCost_costPerKg').textContent = "R " + nf.format(costPerKg);
-      document.getElementById('sellingToCost_gpPerItem').textContent = "R " + nf.format(gpPerItem);
-      document.getElementById('sellingToCostResults').style.display = "block";
-    }
-
-    shapeSelect.addEventListener("change", () => {
-      updateShapeInfo();
-      calculateWeight();
-      calculateCostToSelling();
-      calculateSellingToCost();
-    });
-
-    ["width", "thickness", "lengthM", "totalTonInput", "quantity", "density"].forEach(id => {
-      document.getElementById(id).addEventListener("input", () => {
-        calculateWeight();
-        calculateCostToSelling();
-        calculateSellingToCost();
-      });
-    });
-
-    ["cost_pricePerTon", "cost_weightEach", "cost_gp"].forEach(id => {
-      document.getElementById(id).addEventListener("input", calculateCostToSelling);
-    });
-
-    ["sell_sellingPerTon", "sell_weightEach", "sell_gp"].forEach(id => {
-      document.getElementById(id).addEventListener("input", calculateSellingToCost);
-    });
-
-    document.getElementById("resetBtn").addEventListener("click", () => {
-      document.querySelectorAll('.results').forEach(el => el.style.display = "none");
-      document.querySelectorAll('.error').forEach(el => el.textContent = "");
-      quantityInput.readOnly = false;
-      qtyRow.style.display = "none";
-    });
-
-    window.addEventListener('DOMContentLoaded', () => {
-      updateShapeInfo();
-      calculateWeight();
-      calculateCostToSelling();
-      calculateSellingToCost();
-    });
-  </script>
-</body>
-</html>
