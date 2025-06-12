@@ -56,13 +56,16 @@
       border: 1px solid #ccc;
       border-radius: 4px;
       box-sizing: border-box;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
     .row {
       display: flex;
       gap: 16px;
+      flex-wrap: wrap;
     }
     .col {
       flex: 1;
+      min-width: 140px;
     }
     .results {
       background: #f1f3f6;
@@ -113,16 +116,27 @@
       align-items: center;
       gap: 16px;
       margin-bottom: 8px;
+      flex-wrap: wrap;
     }
     .toggle-row label {
       margin: 0 8px 0 0;
       font-weight: 400;
+      cursor: pointer;
+      user-select: none;
     }
-    .error {
-      color: red;
-      font-size: 0.95em;
-      text-align: center;
-      margin-top: 10px;
+    .error-message {
+      color: #e74c3c;
+      font-size: 0.85em;
+      margin-top: 4px;
+      display: none;
+    }
+    input.invalid, select.invalid {
+      border-color: #e74c3c !important;
+      box-shadow: 0 0 5px rgba(231,76,60,0.5);
+    }
+    input.valid, select.valid {
+      border-color: #27ae60 !important;
+      box-shadow: 0 0 5px rgba(39,174,96,0.5);
     }
     /* Hide only the input and label for Weight per meter/each fields in Pricing Calculators */
     .hidden-field {
@@ -135,7 +149,7 @@
       }
       .row, .button-row, .dual-section {
         flex-direction: column;
-        gap: 0;
+        gap: 12px;
       }
       .col, .dual-col {
         min-width: 100%;
@@ -157,13 +171,18 @@
         font-size: 1.2em;
       }
     }
+    /* Ensure error spans do not break layout */
+    .input-group {
+      position: relative;
+      margin-bottom: 12px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Freestock Calculators</h1>
     <div class="instructions">
-      Enter your values in the input fields below.<br>
+      Enter your values in the input fields below.<br />
       All results update automatically.
     </div>
     <form id="calcForm" autocomplete="off" onsubmit="return false;">
@@ -172,39 +191,59 @@
         <h2>Product Dimensions</h2>
         <div class="row">
           <div class="col">
-            <label for="shapeSelect">Product Shape</label>
-            <select id="shapeSelect">
-              <option value="sheet" selected>Sheet</option>
-              <option value="plate">Plate</option>
-              <option value="coil">Coil</option>
-              <option value="slitcoil">Slit Coil</option>
-            </select>
+            <div class="input-group">
+              <label for="shapeSelect">Product Shape</label>
+              <select id="shapeSelect" tabindex="1" required>
+                <option value="sheet" selected>Sheet</option>
+                <option value="plate">Plate</option>
+                <option value="coil">Coil</option>
+                <option value="slitcoil">Slit Coil</option>
+              </select>
+              <span class="error-message" id="shapeSelectError"></span>
+            </div>
           </div>
         </div>
         <div class="row">
           <div class="col">
-            <label for="width">Width (mm)</label>
-            <input type="number" id="width" value="925" min="1" step="0.01" />
+            <div class="input-group">
+              <label for="width">Width (mm)</label>
+              <input type="number" id="width" value="925" min="1" step="0.01" tabindex="2" autofocus required />
+              <span class="error-message" id="widthError"></span>
+            </div>
           </div>
           <div class="col">
-            <label for="thickness">Thickness (mm)</label>
-            <input type="number" id="thickness" value="0.5" min="0.01" step="0.01" />
+            <div class="input-group">
+              <label for="thickness">Thickness (mm)</label>
+              <input type="number" id="thickness" value="0.5" min="0.01" step="0.01" tabindex="3" required />
+              <span class="error-message" id="thicknessError"></span>
+            </div>
           </div>
           <div class="col" id="lengthCol">
-            <label for="lengthM">Length (meters)</label>
-            <input type="number" id="lengthM" value="1" min="0.001" step="0.001" />
+            <div class="input-group">
+              <label for="lengthM">Length (meters)</label>
+              <input type="number" id="lengthM" value="1" min="0.001" step="0.001" tabindex="4" required />
+              <span class="error-message" id="lengthMError"></span>
+            </div>
           </div>
           <div class="col" id="tonCol" style="display:none;">
-            <label for="totalTonInput">Total Weight (tons)</label>
-            <input type="number" id="totalTonInput" value="1" min="0.0001" step="0.0001" />
+            <div class="input-group">
+              <label for="totalTonInput">Total Weight (tons)</label>
+              <input type="number" id="totalTonInput" value="1" min="0.0001" step="0.0001" tabindex="5" required />
+              <span class="error-message" id="totalTonInputError"></span>
+            </div>
           </div>
           <div class="col">
-            <label for="quantity">Qty</label>
-            <input type="number" id="quantity" value="1" min="1" step="1" readonly />
+            <div class="input-group">
+              <label for="quantity">Qty</label>
+              <input type="number" id="quantity" value="1" min="1" step="1" tabindex="6" readonly />
+            </div>
           </div>
           <div class="col">
-            <label for="density">Density (g/cm³)</label>
-            <input type="number" id="density" value="8.039" min="6" max="9" step="0.001" />
+            <div class="input-group">
+              <label for="density">Density (g/cm³)</label>
+              <input type="number" id="density" value="8.039" min="6" max="9" step="0.001" tabindex="7" required />
+              <span class="error-message" id="densityError"></span>
+            </div>
           </div>
         </div>
         <div class="results" id="weightResults" style="display:none;">
@@ -215,8 +254,8 @@
           <div class="result-item" id="qtyRow" style="display:none;"><span class="result-label">Qty:</span> <span id="qtyResult"></span></div>
           <div class="result-item"><span class="result-label">Total tons:</span> <span id="totalTons"></span></div>
         </div>
-        <div class="error" id="weightError"></div>
       </div>
+
       <!-- Pricing Calculators Segment -->
       <div class="segment">
         <h2>Pricing Calculators</h2>
@@ -224,27 +263,38 @@
           <!-- Cost to Selling -->
           <div class="dual-col">
             <h3>Cost to Selling</h3>
-            <div class="toggle-row">
-              <label><input type="radio" name="cost_mode" value="ton" checked> Enter Cost per Ton</label>
-              <label><input type="radio" name="cost_mode" value="item"> Enter Cost per Item</label>
+            <div class="toggle-row" role="radiogroup" aria-label="Cost to Selling input mode">
+              <label><input type="radio" name="cost_mode" value="ton" checked tabindex="8" /> Enter Cost per Ton</label>
+              <label><input type="radio" name="cost_mode" value="item" tabindex="9" /> Enter Cost per Item</label>
             </div>
             <div class="row">
               <div class="col" id="costPerTonCol">
-                <label for="cost_pricePerTon">Cost Price (R/ton)</label>
-                <input type="number" id="cost_pricePerTon" value="20000" min="0.01" step="0.01" />
+                <div class="input-group">
+                  <label for="cost_pricePerTon">Cost Price (R/ton)</label>
+                  <input type="number" id="cost_pricePerTon" value="20000" min="0.01" step="0.01" tabindex="10" required />
+                  <span class="error-message" id="cost_pricePerTonError"></span>
+                </div>
               </div>
               <div class="col" id="costPerItemCol" style="display:none;">
-                <label for="cost_pricePerItem">Cost Price (R/item)</label>
-                <input type="number" id="cost_pricePerItem" value="93.32" min="0.01" step="0.01" />
+                <div class="input-group">
+                  <label for="cost_pricePerItem">Cost Price (R/item)</label>
+                  <input type="number" id="cost_pricePerItem" value="93.32" min="0.01" step="0.01" tabindex="11" required />
+                  <span class="error-message" id="cost_pricePerItemError"></span>
+                </div>
               </div>
               <!-- Hidden weightEach field -->
               <div class="col">
-                <label for="cost_weightEach" class="hidden-field">Weight per Item (kg)</label>
-                <input type="number" id="cost_weightEach" value="4.66" min="0.01" step="0.01" class="hidden-field" />
+                <div class="input-group">
+                  <label for="cost_weightEach" class="hidden-field">Weight per Item (kg)</label>
+                  <input type="number" id="cost_weightEach" value="4.66" min="0.01" step="0.01" class="hidden-field" tabindex="-1" />
+                </div>
               </div>
               <div class="col">
-                <label for="cost_gp">GP %</label>
-                <input type="number" id="cost_gp" value="25" min="0" max="99.99" step="0.1" />
+                <div class="input-group">
+                  <label for="cost_gp">GP %</label>
+                  <input type="number" id="cost_gp" value="25" min="0" max="99.99" step="0.1" tabindex="12" required />
+                  <span class="error-message" id="cost_gpError"></span>
+                </div>
               </div>
             </div>
             <div class="results" id="costToSellingResults" style="display:none;">
@@ -254,32 +304,43 @@
               <div class="result-item"><span class="result-label">Selling Price per Ton:</span> <span id="costToSelling_sellingPerTon"></span></div>
               <div class="result-item"><span class="result-label">Gross Profit per Item:</span> <span id="costToSelling_gpPerItem"></span></div>
             </div>
-            <div class="error" id="costToSellingError"></div>
           </div>
+
           <!-- Selling to Cost -->
           <div class="dual-col">
             <h3>Selling to Cost</h3>
-            <div class="toggle-row">
-              <label><input type="radio" name="sell_mode" value="ton" checked> Enter Selling Price per Ton</label>
-              <label><input type="radio" name="sell_mode" value="item"> Enter Selling Price per Item</label>
+            <div class="toggle-row" role="radiogroup" aria-label="Selling to Cost input mode">
+              <label><input type="radio" name="sell_mode" value="ton" checked tabindex="13" /> Enter Selling Price per Ton</label>
+              <label><input type="radio" name="sell_mode" value="item" tabindex="14" /> Enter Selling Price per Item</label>
             </div>
             <div class="row">
               <div class="col" id="sellPerTonCol">
-                <label for="sell_sellingPerTon">Selling Price (R/ton)</label>
-                <input type="number" id="sell_sellingPerTon" value="26667" min="0.01" step="0.01" />
+                <div class="input-group">
+                  <label for="sell_sellingPerTon">Selling Price (R/ton)</label>
+                  <input type="number" id="sell_sellingPerTon" value="26667" min="0.01" step="0.01" tabindex="15" required />
+                  <span class="error-message" id="sell_sellingPerTonError"></span>
+                </div>
               </div>
               <div class="col" id="sellPerItemCol" style="display:none;">
-                <label for="sell_sellingPerItem">Selling Price (R/item)</label>
-                <input type="number" id="sell_sellingPerItem" value="124.43" min="0.01" step="0.01" />
+                <div class="input-group">
+                  <label for="sell_sellingPerItem">Selling Price (R/item)</label>
+                  <input type="number" id="sell_sellingPerItem" value="124.43" min="0.01" step="0.01" tabindex="16" required />
+                  <span class="error-message" id="sell_sellingPerItemError"></span>
+                </div>
               </div>
               <!-- Hidden weightEach field -->
               <div class="col">
-                <label for="sell_weightEach" class="hidden-field">Weight per Item (kg)</label>
-                <input type="number" id="sell_weightEach" value="4.66" min="0.01" step="0.01" class="hidden-field" />
+                <div class="input-group">
+                  <label for="sell_weightEach" class="hidden-field">Weight per Item (kg)</label>
+                  <input type="number" id="sell_weightEach" value="4.66" min="0.01" step="0.01" class="hidden-field" tabindex="-1" />
+                </div>
               </div>
               <div class="col">
-                <label for="sell_gp">GP %</label>
-                <input type="number" id="sell_gp" value="25" min="0" max="99.99" step="0.1" />
+                <div class="input-group">
+                  <label for="sell_gp">GP %</label>
+                  <input type="number" id="sell_gp" value="25" min="0" max="99.99" step="0.1" tabindex="17" required />
+                  <span class="error-message" id="sell_gpError"></span>
+                </div>
               </div>
             </div>
             <div class="results" id="sellingToCostResults" style="display:none;">
@@ -289,20 +350,20 @@
               <div class="result-item"><span class="result-label">Cost per Ton:</span> <span id="sellingToCost_costPerTon"></span></div>
               <div class="result-item"><span class="result-label">Gross Profit per Item:</span> <span id="sellingToCost_gpPerItem"></span></div>
             </div>
-            <div class="error" id="sellingToCostError"></div>
           </div>
         </div>
-        <button type="reset" id="resetBtn">Reset All</button>
+        <button type="reset" id="resetBtn" tabindex="18">Reset All</button>
       </div>
     </form>
   </div>
+
   <script>
-    // Utility functions
+    // Utility function for rounding
     function round(num, decimals = 2) {
       return parseFloat(num.toFixed(decimals));
     }
 
-    // DOM Elements
+    // Elements references
     const shapeSelect = document.getElementById('shapeSelect');
     const widthInput = document.getElementById('width');
     const thicknessInput = document.getElementById('thickness');
@@ -320,10 +381,8 @@
     const qtyRow = document.getElementById('qtyRow');
     const qtyResult = document.getElementById('qtyResult');
     const totalTons = document.getElementById('totalTons');
-    const weightError = document.getElementById('weightError');
 
     // Pricing Calculator DOM
-    // Cost to Selling
     const costModeRadios = document.getElementsByName('cost_mode');
     const costPerTonCol = document.getElementById('costPerTonCol');
     const costPerItemCol = document.getElementById('costPerItemCol');
@@ -339,9 +398,7 @@
     const costToSelling_sellingPerItem = document.getElementById('costToSelling_sellingPerItem');
     const costToSelling_sellingPerTon = document.getElementById('costToSelling_sellingPerTon');
     const costToSelling_gpPerItem = document.getElementById('costToSelling_gpPerItem');
-    const costToSellingError = document.getElementById('costToSellingError');
 
-    // Selling to Cost
     const sellModeRadios = document.getElementsByName('sell_mode');
     const sellPerTonCol = document.getElementById('sellPerTonCol');
     const sellPerItemCol = document.getElementById('sellPerItemCol');
@@ -357,50 +414,99 @@
     const sellingToCost_costPerItem = document.getElementById('sellingToCost_costPerItem');
     const sellingToCost_costPerTon = document.getElementById('sellingToCost_costPerTon');
     const sellingToCost_gpPerItem = document.getElementById('sellingToCost_gpPerItem');
-    const sellingToCostError = document.getElementById('sellingToCostError');
 
-    // Reset Button
     const resetBtn = document.getElementById('resetBtn');
 
-    // Calculation logic
+    // Validation helpers
+    function showError(inputId, message) {
+      const input = document.getElementById(inputId);
+      const errorSpan = document.getElementById(inputId + 'Error');
+      if (errorSpan) {
+        errorSpan.textContent = message;
+        errorSpan.style.display = 'block';
+        input.classList.add('invalid');
+        input.classList.remove('valid');
+      }
+    }
+
+    function clearError(inputId) {
+      const input = document.getElementById(inputId);
+      const errorSpan = document.getElementById(inputId + 'Error');
+      if (errorSpan) {
+        errorSpan.textContent = '';
+        errorSpan.style.display = 'none';
+        input.classList.remove('invalid');
+        input.classList.add('valid');
+      }
+    }
+
+    function validateInput(input) {
+      if (!input) return false;
+      const val = input.value.trim();
+      if (input.hasAttribute('required') && val === '') {
+        showError(input.id, 'This field is required');
+        return false;
+      }
+      if (input.type === 'number') {
+        const numVal = parseFloat(val);
+        if (isNaN(numVal)) {
+          showError(input.id, 'Must be a number');
+          return false;
+        }
+        if (input.min !== '' && numVal < parseFloat(input.min)) {
+          showError(input.id, `Minimum value is ${input.min}`);
+          return false;
+        }
+        if (input.max !== '' && numVal > parseFloat(input.max)) {
+          showError(input.id, `Maximum value is ${input.max}`);
+          return false;
+        }
+      }
+      clearError(input.id);
+      return true;
+    }
+
+    // Validate all visible inputs
+    function validateAllInputs() {
+      let allValid = true;
+      const inputs = document.querySelectorAll('input, select');
+      inputs.forEach(input => {
+        if (input.offsetParent !== null && !input.disabled && input.getAttribute('tabindex') !== '-1') {
+          if (!validateInput(input)) allValid = false;
+        }
+      });
+      return allValid;
+    }
+
+    // Calculation functions
     function calcWeight() {
-      weightError.textContent = '';
       let width = parseFloat(widthInput.value);
       let thickness = parseFloat(thicknessInput.value);
       let length = parseFloat(lengthInput.value);
       let qty = parseInt(qtyInput.value, 10);
       let density = parseFloat(densityInput.value);
 
-      if (isNaN(width) || isNaN(thickness) || isNaN(length) || isNaN(qty) || isNaN(density)) {
+      if (shapeSelect.value === 'coil' || shapeSelect.value === 'slitcoil') {
+        length = parseFloat(lengthInput.value);
+      }
+
+      if ([width, thickness, length, qty, density].some(v => isNaN(v) || v <= 0)) {
         weightResults.style.display = 'none';
         return null;
       }
-      if (width <= 0 || thickness <= 0 || length <= 0 || qty <= 0 || density <= 0) {
-        weightError.textContent = 'All values must be positive numbers.';
-        weightResults.style.display = 'none';
-        return null;
-      }
-      // Convert mm to cm for width and thickness
+
       let width_cm = width / 10;
       let thickness_cm = thickness / 10;
-      // Volume per meter (cm³)
-      let volPerM = width_cm * thickness_cm * 100; // 100cm = 1m
-      // Weight per meter (kg)
+      let volPerM = width_cm * thickness_cm * 100;
       let kg_per_m = volPerM * density / 1000;
-      // Weight each (kg)
       let weight_each = kg_per_m * length;
-      // Total weight (kg)
       let total_weight = weight_each * qty;
-      // Total meters
       let total_meters = length * qty;
-      // Total tons
       let total_tons = total_weight / 1000;
 
-      // Update hidden fields for pricing calculators
       cost_weightEach.value = round(weight_each, 4);
       sell_weightEach.value = round(weight_each, 4);
 
-      // Update results
       kgPerM.textContent = round(kg_per_m, 4) + ' kg';
       weightEachKg.textContent = round(weight_each, 4) + ' kg';
       totalWeight.textContent = round(total_weight, 2) + ' kg';
@@ -419,7 +525,6 @@
     }
 
     function calcCostToSelling() {
-      costToSellingError.textContent = '';
       let mode = Array.from(costModeRadios).find(r => r.checked).value;
       let cost_per_ton = parseFloat(cost_pricePerTon.value);
       let cost_per_item = parseFloat(cost_pricePerItem.value);
@@ -427,14 +532,12 @@
       let gp = parseFloat(cost_gp.value);
 
       if (isNaN(weight_each) || weight_each <= 0) {
-        costToSellingError.textContent = 'Weight per item is invalid. Please check your dimensions.';
         costToSellingResults.style.display = 'none';
         return;
       }
-      let showPerTon = true, showPerItem = true;
+
       if (mode === 'ton') {
         if (isNaN(cost_per_ton) || cost_per_ton <= 0) {
-          costToSellingError.textContent = 'Enter valid cost per ton.';
           costToSellingResults.style.display = 'none';
           return;
         }
@@ -442,17 +545,15 @@
         cost_pricePerItem.value = round(cost_per_item, 2);
       } else {
         if (isNaN(cost_per_item) || cost_per_item <= 0) {
-          costToSellingError.textContent = 'Enter valid cost per item.';
           costToSellingResults.style.display = 'none';
           return;
         }
         cost_per_ton = cost_per_item / weight_each * 1000;
         cost_pricePerTon.value = round(cost_per_ton, 2);
       }
-      // Selling price
+
       let selling_per_item = cost_per_item / (1 - gp / 100);
       let selling_per_ton = selling_per_item / weight_each * 1000;
-      // GP per item
       let gp_per_item = selling_per_item - cost_per_item;
 
       costToSelling_costPerItem.textContent = 'R ' + round(cost_per_item, 2);
@@ -467,7 +568,6 @@
     }
 
     function calcSellingToCost() {
-      sellingToCostError.textContent = '';
       let mode = Array.from(sellModeRadios).find(r => r.checked).value;
       let selling_per_ton = parseFloat(sell_sellingPerTon.value);
       let selling_per_item = parseFloat(sell_sellingPerItem.value);
@@ -475,13 +575,12 @@
       let gp = parseFloat(sell_gp.value);
 
       if (isNaN(weight_each) || weight_each <= 0) {
-        sellingToCostError.textContent = 'Weight per item is invalid. Please check your dimensions.';
         sellingToCostResults.style.display = 'none';
         return;
       }
+
       if (mode === 'ton') {
         if (isNaN(selling_per_ton) || selling_per_ton <= 0) {
-          sellingToCostError.textContent = 'Enter valid selling price per ton.';
           sellingToCostResults.style.display = 'none';
           return;
         }
@@ -489,17 +588,15 @@
         sell_sellingPerItem.value = round(selling_per_item, 2);
       } else {
         if (isNaN(selling_per_item) || selling_per_item <= 0) {
-          sellingToCostError.textContent = 'Enter valid selling price per item.';
           sellingToCostResults.style.display = 'none';
           return;
         }
         selling_per_ton = selling_per_item / weight_each * 1000;
         sell_sellingPerTon.value = round(selling_per_ton, 2);
       }
-      // Cost price
+
       let cost_per_item = selling_per_item * (1 - gp / 100);
       let cost_per_ton = cost_per_item / weight_each * 1000;
-      // GP per item
       let gp_per_item = selling_per_item - cost_per_item;
 
       sellingToCost_sellingPerItem.textContent = 'R ' + round(selling_per_item, 2);
@@ -513,17 +610,37 @@
       sellingToCostResults.style.display = '';
     }
 
-    // Event Listeners
+    // Update all calculations and validation
     function updateAll() {
-      let weightObj = calcWeight();
+      if (!validateAllInputs()) {
+        weightResults.style.display = 'none';
+        costToSellingResults.style.display = 'none';
+        sellingToCostResults.style.display = 'none';
+        return;
+      }
+      const weightObj = calcWeight();
       if (weightObj) {
         calcCostToSelling();
         calcSellingToCost();
       }
     }
 
-    shapeSelect.addEventListener('change', function() {
-      // Show/hide length/ton input
+    // Event listeners for inputs
+    const inputsToWatch = [
+      shapeSelect, widthInput, thicknessInput, lengthInput, tonInput, densityInput,
+      cost_pricePerTon, cost_pricePerItem, cost_gp,
+      sell_sellingPerTon, sell_sellingPerItem, sell_gp
+    ];
+
+    inputsToWatch.forEach(input => {
+      input.addEventListener('input', () => {
+        validateInput(input);
+        updateAll();
+      });
+    });
+
+    // Shape select change toggles length/ton inputs
+    shapeSelect.addEventListener('change', () => {
       if (shapeSelect.value === 'coil' || shapeSelect.value === 'slitcoil') {
         lengthCol.style.display = 'none';
         tonCol.style.display = '';
@@ -535,74 +652,56 @@
       updateAll();
     });
 
-    [widthInput, thicknessInput, lengthInput, tonInput, qtyInput, densityInput].forEach(el => {
-      el.addEventListener('input', function() {
-        if (shapeSelect.value === 'coil' || shapeSelect.value === 'slitcoil') {
-          // recalc length from ton
-          let width = parseFloat(widthInput.value);
-          let thickness = parseFloat(thicknessInput.value);
-          let density = parseFloat(densityInput.value);
-          let tons = parseFloat(tonInput.value);
-          if (isNaN(width) || isNaN(thickness) || isNaN(density) || isNaN(tons) || width <= 0 || thickness <= 0 || density <= 0 || tons <= 0) {
-            return;
-          }
-          // Calculate length for given tons
-          let width_cm = width / 10;
-          let thickness_cm = thickness / 10;
-          let volPerM = width_cm * thickness_cm * 100;
-          let kg_per_m = volPerM * density / 1000;
-          let total_kg = tons * 1000;
-          let length = total_kg / kg_per_m;
-          lengthInput.value = round(length, 3);
-        }
-        updateAll();
-      });
-    });
-
-    // Pricing calculator toggles
+    // Radio toggles for cost to selling
     costModeRadios.forEach(radio => {
-      radio.addEventListener('change', function() {
-        if (this.value === 'ton') {
-          costPerTonCol.style.display = '';
-          costPerItemCol.style.display = 'none';
-        } else {
-          costPerTonCol.style.display = 'none';
-          costPerItemCol.style.display = '';
+      radio.addEventListener('change', () => {
+        if (radio.checked) {
+          if (radio.value === 'ton') {
+            costPerTonCol.style.display = '';
+            costPerItemCol.style.display = 'none';
+          } else {
+            costPerTonCol.style.display = 'none';
+            costPerItemCol.style.display = '';
+          }
+          updateAll();
         }
-        calcCostToSelling();
       });
     });
+
+    // Radio toggles for selling to cost
     sellModeRadios.forEach(radio => {
-      radio.addEventListener('change', function() {
-        if (this.value === 'ton') {
-          sellPerTonCol.style.display = '';
-          sellPerItemCol.style.display = 'none';
-        } else {
-          sellPerTonCol.style.display = 'none';
-          sellPerItemCol.style.display = '';
+      radio.addEventListener('change', () => {
+        if (radio.checked) {
+          if (radio.value === 'ton') {
+            sellPerTonCol.style.display = '';
+            sellPerItemCol.style.display = 'none';
+          } else {
+            sellPerTonCol.style.display = 'none';
+            sellPerItemCol.style.display = '';
+          }
+          updateAll();
         }
-        calcSellingToCost();
       });
     });
 
-    [
-      cost_pricePerTon, cost_pricePerItem, cost_weightEach, cost_gp,
-      sell_sellingPerTon, sell_sellingPerItem, sell_weightEach, sell_gp
-    ].forEach(el => {
-      el.addEventListener('input', function() {
-        calcCostToSelling();
-        calcSellingToCost();
-      });
-    });
-
-    resetBtn.addEventListener('click', function() {
+    // Reset button
+    resetBtn.addEventListener('click', () => {
       setTimeout(() => {
+        // Clear validation styles and errors
+        const inputs = document.querySelectorAll('input, select');
+        inputs.forEach(input => {
+          input.classList.remove('invalid', 'valid');
+          const errorSpan = document.getElementById(input.id + 'Error');
+          if (errorSpan) errorSpan.style.display = 'none';
+        });
         updateAll();
       }, 50);
     });
 
-    // Initial calculation
-    updateAll();
+    // Initial calculation and validation on page load
+    window.addEventListener('load', () => {
+      updateAll();
+    });
   </script>
 </body>
 </html>
