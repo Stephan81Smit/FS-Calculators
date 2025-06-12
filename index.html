@@ -124,35 +124,8 @@
       text-align: center;
       margin-top: 10px;
     }
-    /* Hide the Weight per meter/each fields in Pricing Calculators */
-    #cost_weightEach, #sell_weightEach {
-      display: none !important;
-    }
-    #cost_weightEach + label,
-    #sell_weightEach + label {
-      display: none !important;
-    }
-    /* Hide the column entirely for better alignment */
-    #cost_weightEach, #sell_weightEach {
-      display: none !important;
-    }
-    #cost_weightEach, #sell_weightEach {
-      display: none !important;
-    }
-    /* Hide the column container (the <div class="col">) */
-    #cost_weightEach, #sell_weightEach {
-      display: none !important;
-    }
-    /* Hide the parent column for both fields */
-    #cost_weightEach, #sell_weightEach {
-      display: none !important;
-    }
-    /* Hide the parent .col for both fields */
-    #cost_weightEach, #sell_weightEach {
-      display: none !important;
-    }
-    /* Hide the parent column for both fields */
-    #cost_weightEach, #sell_weightEach {
+    /* Hide only the input and label for Weight per meter/each fields in Pricing Calculators */
+    .hidden-field {
       display: none !important;
     }
     /* Responsive */
@@ -265,9 +238,9 @@
                 <input type="number" id="cost_pricePerItem" value="93.32" min="0.01" step="0.01" />
               </div>
               <!-- Hidden weightEach field -->
-              <div class="col" style="display:none;">
-                <label for="cost_weightEach">Weight per Item (kg)</label>
-                <input type="number" id="cost_weightEach" value="4.66" min="0.01" step="0.01" />
+              <div class="col">
+                <label for="cost_weightEach" class="hidden-field">Weight per Item (kg)</label>
+                <input type="number" id="cost_weightEach" value="4.66" min="0.01" step="0.01" class="hidden-field" />
               </div>
               <div class="col">
                 <label for="cost_gp">GP %</label>
@@ -300,9 +273,9 @@
                 <input type="number" id="sell_sellingPerItem" value="124.43" min="0.01" step="0.01" />
               </div>
               <!-- Hidden weightEach field -->
-              <div class="col" style="display:none;">
-                <label for="sell_weightEach">Weight per Item (kg)</label>
-                <input type="number" id="sell_weightEach" value="4.66" min="0.01" step="0.01" />
+              <div class="col">
+                <label for="sell_weightEach" class="hidden-field">Weight per Item (kg)</label>
+                <input type="number" id="sell_weightEach" value="4.66" min="0.01" step="0.01" class="hidden-field" />
               </div>
               <div class="col">
                 <label for="sell_gp">GP %</label>
@@ -324,8 +297,312 @@
     </form>
   </div>
   <script>
-    // (JavaScript remains unchanged from your original file)
-    // ... (Paste your original script here)
+    // Utility functions
+    function round(num, decimals = 2) {
+      return parseFloat(num.toFixed(decimals));
+    }
+
+    // DOM Elements
+    const shapeSelect = document.getElementById('shapeSelect');
+    const widthInput = document.getElementById('width');
+    const thicknessInput = document.getElementById('thickness');
+    const lengthInput = document.getElementById('lengthM');
+    const tonInput = document.getElementById('totalTonInput');
+    const tonCol = document.getElementById('tonCol');
+    const lengthCol = document.getElementById('lengthCol');
+    const qtyInput = document.getElementById('quantity');
+    const densityInput = document.getElementById('density');
+    const weightResults = document.getElementById('weightResults');
+    const kgPerM = document.getElementById('kgPerM');
+    const weightEachKg = document.getElementById('weightEachKg');
+    const totalWeight = document.getElementById('totalWeight');
+    const totalMeters = document.getElementById('totalMeters');
+    const qtyRow = document.getElementById('qtyRow');
+    const qtyResult = document.getElementById('qtyResult');
+    const totalTons = document.getElementById('totalTons');
+    const weightError = document.getElementById('weightError');
+
+    // Pricing Calculator DOM
+    // Cost to Selling
+    const costModeRadios = document.getElementsByName('cost_mode');
+    const costPerTonCol = document.getElementById('costPerTonCol');
+    const costPerItemCol = document.getElementById('costPerItemCol');
+    const cost_pricePerTon = document.getElementById('cost_pricePerTon');
+    const cost_pricePerItem = document.getElementById('cost_pricePerItem');
+    const cost_weightEach = document.getElementById('cost_weightEach');
+    const cost_gp = document.getElementById('cost_gp');
+    const costToSellingResults = document.getElementById('costToSellingResults');
+    const costToSelling_costPerItemRow = document.getElementById('costToSelling_costPerItemRow');
+    const costToSelling_costPerTonRow = document.getElementById('costToSelling_costPerTonRow');
+    const costToSelling_costPerItem = document.getElementById('costToSelling_costPerItem');
+    const costToSelling_costPerTon = document.getElementById('costToSelling_costPerTon');
+    const costToSelling_sellingPerItem = document.getElementById('costToSelling_sellingPerItem');
+    const costToSelling_sellingPerTon = document.getElementById('costToSelling_sellingPerTon');
+    const costToSelling_gpPerItem = document.getElementById('costToSelling_gpPerItem');
+    const costToSellingError = document.getElementById('costToSellingError');
+
+    // Selling to Cost
+    const sellModeRadios = document.getElementsByName('sell_mode');
+    const sellPerTonCol = document.getElementById('sellPerTonCol');
+    const sellPerItemCol = document.getElementById('sellPerItemCol');
+    const sell_sellingPerTon = document.getElementById('sell_sellingPerTon');
+    const sell_sellingPerItem = document.getElementById('sell_sellingPerItem');
+    const sell_weightEach = document.getElementById('sell_weightEach');
+    const sell_gp = document.getElementById('sell_gp');
+    const sellingToCostResults = document.getElementById('sellingToCostResults');
+    const sellingToCost_sellingPerItemRow = document.getElementById('sellingToCost_sellingPerItemRow');
+    const sellingToCost_sellingPerTonRow = document.getElementById('sellingToCost_sellingPerTonRow');
+    const sellingToCost_sellingPerItem = document.getElementById('sellingToCost_sellingPerItem');
+    const sellingToCost_sellingPerTon = document.getElementById('sellingToCost_sellingPerTon');
+    const sellingToCost_costPerItem = document.getElementById('sellingToCost_costPerItem');
+    const sellingToCost_costPerTon = document.getElementById('sellingToCost_costPerTon');
+    const sellingToCost_gpPerItem = document.getElementById('sellingToCost_gpPerItem');
+    const sellingToCostError = document.getElementById('sellingToCostError');
+
+    // Reset Button
+    const resetBtn = document.getElementById('resetBtn');
+
+    // Calculation logic
+    function calcWeight() {
+      weightError.textContent = '';
+      let width = parseFloat(widthInput.value);
+      let thickness = parseFloat(thicknessInput.value);
+      let length = parseFloat(lengthInput.value);
+      let qty = parseInt(qtyInput.value, 10);
+      let density = parseFloat(densityInput.value);
+
+      if (isNaN(width) || isNaN(thickness) || isNaN(length) || isNaN(qty) || isNaN(density)) {
+        weightResults.style.display = 'none';
+        return null;
+      }
+      if (width <= 0 || thickness <= 0 || length <= 0 || qty <= 0 || density <= 0) {
+        weightError.textContent = 'All values must be positive numbers.';
+        weightResults.style.display = 'none';
+        return null;
+      }
+      // Convert mm to cm for width and thickness
+      let width_cm = width / 10;
+      let thickness_cm = thickness / 10;
+      // Volume per meter (cm³)
+      let volPerM = width_cm * thickness_cm * 100; // 100cm = 1m
+      // Weight per meter (kg)
+      let kg_per_m = volPerM * density / 1000;
+      // Weight each (kg)
+      let weight_each = kg_per_m * length;
+      // Total weight (kg)
+      let total_weight = weight_each * qty;
+      // Total meters
+      let total_meters = length * qty;
+      // Total tons
+      let total_tons = total_weight / 1000;
+
+      // Update hidden fields for pricing calculators
+      cost_weightEach.value = round(weight_each, 4);
+      sell_weightEach.value = round(weight_each, 4);
+
+      // Update results
+      kgPerM.textContent = round(kg_per_m, 4) + ' kg';
+      weightEachKg.textContent = round(weight_each, 4) + ' kg';
+      totalWeight.textContent = round(total_weight, 2) + ' kg';
+      totalMeters.textContent = round(total_meters, 2) + ' m';
+      qtyResult.textContent = qty;
+      totalTons.textContent = round(total_tons, 4) + ' t';
+      weightResults.style.display = '';
+      return {
+        kg_per_m,
+        weight_each,
+        total_weight,
+        total_meters,
+        qty,
+        total_tons
+      };
+    }
+
+    function calcCostToSelling() {
+      costToSellingError.textContent = '';
+      let mode = Array.from(costModeRadios).find(r => r.checked).value;
+      let cost_per_ton = parseFloat(cost_pricePerTon.value);
+      let cost_per_item = parseFloat(cost_pricePerItem.value);
+      let weight_each = parseFloat(cost_weightEach.value);
+      let gp = parseFloat(cost_gp.value);
+
+      if (isNaN(weight_each) || weight_each <= 0) {
+        costToSellingError.textContent = 'Weight per item is invalid. Please check your dimensions.';
+        costToSellingResults.style.display = 'none';
+        return;
+      }
+      let showPerTon = true, showPerItem = true;
+      if (mode === 'ton') {
+        if (isNaN(cost_per_ton) || cost_per_ton <= 0) {
+          costToSellingError.textContent = 'Enter valid cost per ton.';
+          costToSellingResults.style.display = 'none';
+          return;
+        }
+        cost_per_item = cost_per_ton * weight_each / 1000;
+        cost_pricePerItem.value = round(cost_per_item, 2);
+      } else {
+        if (isNaN(cost_per_item) || cost_per_item <= 0) {
+          costToSellingError.textContent = 'Enter valid cost per item.';
+          costToSellingResults.style.display = 'none';
+          return;
+        }
+        cost_per_ton = cost_per_item / weight_each * 1000;
+        cost_pricePerTon.value = round(cost_per_ton, 2);
+      }
+      // Selling price
+      let selling_per_item = cost_per_item / (1 - gp / 100);
+      let selling_per_ton = selling_per_item / weight_each * 1000;
+      // GP per item
+      let gp_per_item = selling_per_item - cost_per_item;
+
+      costToSelling_costPerItem.textContent = 'R ' + round(cost_per_item, 2);
+      costToSelling_costPerTon.textContent = 'R ' + round(cost_per_ton, 2);
+      costToSelling_sellingPerItem.textContent = 'R ' + round(selling_per_item, 2);
+      costToSelling_sellingPerTon.textContent = 'R ' + round(selling_per_ton, 2);
+      costToSelling_gpPerItem.textContent = 'R ' + round(gp_per_item, 2);
+
+      costToSelling_costPerItemRow.style.display = '';
+      costToSelling_costPerTonRow.style.display = '';
+      costToSellingResults.style.display = '';
+    }
+
+    function calcSellingToCost() {
+      sellingToCostError.textContent = '';
+      let mode = Array.from(sellModeRadios).find(r => r.checked).value;
+      let selling_per_ton = parseFloat(sell_sellingPerTon.value);
+      let selling_per_item = parseFloat(sell_sellingPerItem.value);
+      let weight_each = parseFloat(sell_weightEach.value);
+      let gp = parseFloat(sell_gp.value);
+
+      if (isNaN(weight_each) || weight_each <= 0) {
+        sellingToCostError.textContent = 'Weight per item is invalid. Please check your dimensions.';
+        sellingToCostResults.style.display = 'none';
+        return;
+      }
+      if (mode === 'ton') {
+        if (isNaN(selling_per_ton) || selling_per_ton <= 0) {
+          sellingToCostError.textContent = 'Enter valid selling price per ton.';
+          sellingToCostResults.style.display = 'none';
+          return;
+        }
+        selling_per_item = selling_per_ton * weight_each / 1000;
+        sell_sellingPerItem.value = round(selling_per_item, 2);
+      } else {
+        if (isNaN(selling_per_item) || selling_per_item <= 0) {
+          sellingToCostError.textContent = 'Enter valid selling price per item.';
+          sellingToCostResults.style.display = 'none';
+          return;
+        }
+        selling_per_ton = selling_per_item / weight_each * 1000;
+        sell_sellingPerTon.value = round(selling_per_ton, 2);
+      }
+      // Cost price
+      let cost_per_item = selling_per_item * (1 - gp / 100);
+      let cost_per_ton = cost_per_item / weight_each * 1000;
+      // GP per item
+      let gp_per_item = selling_per_item - cost_per_item;
+
+      sellingToCost_sellingPerItem.textContent = 'R ' + round(selling_per_item, 2);
+      sellingToCost_sellingPerTon.textContent = 'R ' + round(selling_per_ton, 2);
+      sellingToCost_costPerItem.textContent = 'R ' + round(cost_per_item, 2);
+      sellingToCost_costPerTon.textContent = 'R ' + round(cost_per_ton, 2);
+      sellingToCost_gpPerItem.textContent = 'R ' + round(gp_per_item, 2);
+
+      sellingToCost_sellingPerItemRow.style.display = '';
+      sellingToCost_sellingPerTonRow.style.display = '';
+      sellingToCostResults.style.display = '';
+    }
+
+    // Event Listeners
+    function updateAll() {
+      let weightObj = calcWeight();
+      if (weightObj) {
+        calcCostToSelling();
+        calcSellingToCost();
+      }
+    }
+
+    shapeSelect.addEventListener('change', function() {
+      // Show/hide length/ton input
+      if (shapeSelect.value === 'coil' || shapeSelect.value === 'slitcoil') {
+        lengthCol.style.display = 'none';
+        tonCol.style.display = '';
+        qtyInput.value = 1;
+      } else {
+        lengthCol.style.display = '';
+        tonCol.style.display = 'none';
+      }
+      updateAll();
+    });
+
+    [widthInput, thicknessInput, lengthInput, tonInput, qtyInput, densityInput].forEach(el => {
+      el.addEventListener('input', function() {
+        if (shapeSelect.value === 'coil' || shapeSelect.value === 'slitcoil') {
+          // recalc length from ton
+          let width = parseFloat(widthInput.value);
+          let thickness = parseFloat(thicknessInput.value);
+          let density = parseFloat(densityInput.value);
+          let tons = parseFloat(tonInput.value);
+          if (isNaN(width) || isNaN(thickness) || isNaN(density) || isNaN(tons) || width <= 0 || thickness <= 0 || density <= 0 || tons <= 0) {
+            return;
+          }
+          // Calculate length for given tons
+          let width_cm = width / 10;
+          let thickness_cm = thickness / 10;
+          let volPerM = width_cm * thickness_cm * 100;
+          let kg_per_m = volPerM * density / 1000;
+          let total_kg = tons * 1000;
+          let length = total_kg / kg_per_m;
+          lengthInput.value = round(length, 3);
+        }
+        updateAll();
+      });
+    });
+
+    // Pricing calculator toggles
+    costModeRadios.forEach(radio => {
+      radio.addEventListener('change', function() {
+        if (this.value === 'ton') {
+          costPerTonCol.style.display = '';
+          costPerItemCol.style.display = 'none';
+        } else {
+          costPerTonCol.style.display = 'none';
+          costPerItemCol.style.display = '';
+        }
+        calcCostToSelling();
+      });
+    });
+    sellModeRadios.forEach(radio => {
+      radio.addEventListener('change', function() {
+        if (this.value === 'ton') {
+          sellPerTonCol.style.display = '';
+          sellPerItemCol.style.display = 'none';
+        } else {
+          sellPerTonCol.style.display = 'none';
+          sellPerItemCol.style.display = '';
+        }
+        calcSellingToCost();
+      });
+    });
+
+    [
+      cost_pricePerTon, cost_pricePerItem, cost_weightEach, cost_gp,
+      sell_sellingPerTon, sell_sellingPerItem, sell_weightEach, sell_gp
+    ].forEach(el => {
+      el.addEventListener('input', function() {
+        calcCostToSelling();
+        calcSellingToCost();
+      });
+    });
+
+    resetBtn.addEventListener('click', function() {
+      setTimeout(() => {
+        updateAll();
+      }, 50);
+    });
+
+    // Initial calculation
+    updateAll();
   </script>
 </body>
 </html>
