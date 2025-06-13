@@ -33,28 +33,33 @@
 <body>
     <div class="container">
         <h1>Freestock Slitting Calculator</h1>
+        
         <div class="input-group">
             <label for="coilNo">Coil No.:</label>
-            <input type="text" id="coilNo" aria-label="Coil Number" placeholder="Enter Coil Number">
+            <input type="text" id="coilNo" placeholder="Enter Coil Number">
         </div>
+        
         <div class="input-group">
             <label for="coilWidth">Coil Width (mm):</label>
-            <input type="number" id="coilWidth" aria-label="Coil Width" value="1225" min="1" required>
+            <input type="number" id="coilWidth" value="1225" required>
             <span class="error-message" id="coilWidthError"></span>
         </div>
+        
         <div class="input-group">
             <label for="totalTrim">Total Trim (mm):</label>
-            <input type="number" id="totalTrim" aria-label="Total Trim" value="16" min="0" required>
+            <input type="number" id="totalTrim" value="16" required>
             <span class="error-message" id="totalTrimError"></span>
         </div>
+
         <div class="input-group">
             <label for="materialThickness">Material Thickness (mm):</label>
-            <input type="number" id="materialThickness" aria-label="Material Thickness" step="0.01" min="0.001" required>
+            <input type="number" id="materialThickness" step="0.01" required>
             <span class="error-message" id="materialThicknessError"></span>
         </div>
+        
         <div class="input-group">
             <label for="materialDensity">Density (kg/m³):</label>
-            <input type="number" id="materialDensity" aria-label="Material Density" value="7850" min="1" required>
+            <input type="number" id="materialDensity" value="7850" required>
             <span class="error-message" id="materialDensityError"></span>
         </div>
 
@@ -65,16 +70,16 @@
                     <th></th>
                     <th>Slit Size (mm)</th>
                     <th>Min Qty</th>
-                    <th>Max Qty <span style="font-weight:normal;">(blank = unlimited)</span></th>
+                    <th>Max Qty</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 <tr draggable="true">
-                    <td class="drag-handle" title="Drag to reorder" aria-label="Drag to reorder">&#9776;</td>
-                    <td><input type="number" class="slit-size" aria-label="Slit Size" value="196" min="1" required></td>
-                    <td><input type="number" class="min-qty" aria-label="Min Quantity" min="0"></td>
-                    <td><input type="number" class="max-qty" aria-label="Max Quantity" min="0"></td>
+                    <td class="drag-handle" title="Drag to reorder">☰</td>
+                    <td><input type="number" class="slit-size" value="196" required></td>
+                    <td><input type="number" class="min-qty"></td>
+                    <td><input type="number" class="max-qty"></td>
                     <td><button class="add-remove-btn" onclick="removeRow(this)">Remove</button></td>
                 </tr>
             </tbody>
@@ -86,51 +91,58 @@
         <button onclick="clearAllSlits()">Clear All Slits</button>
         <button onclick="exportToCSV()">Export to CSV</button>
 
-        <div id="results" class="result" tabindex="0" aria-live="polite"></div>
+        <div id="results" class="result"></div>
     </div>
 
     <script>
-        // Drag and drop for row reordering
+        // Drag and Drop Functionality
         let draggedRow = null;
-        document.addEventListener('dragstart', function(e) {
-            if (e.target.closest('tr') && e.target.classList.contains('drag-handle')) {
+
+        document.addEventListener('dragstart', e => {
+            if(e.target.classList.contains('drag-handle')) {
                 draggedRow = e.target.closest('tr');
-                e.dataTransfer.effectAllowed = 'move';
+                setTimeout(() => draggedRow.style.opacity = '0.4', 0);
             }
         });
-        document.addEventListener('dragover', function(e) {
+
+        document.addEventListener('dragend', () => {
+            if(draggedRow) {
+                draggedRow.style.opacity = '1';
+                draggedRow = null;
+            }
+        });
+
+        document.addEventListener('dragover', e => {
             e.preventDefault();
             const tbody = document.querySelector('#slitTable tbody');
             const afterElement = getDragAfterElement(tbody, e.clientY);
-            if (draggedRow && afterElement !== draggedRow) {
+            
+            if(afterElement) {
                 tbody.insertBefore(draggedRow, afterElement);
+            } else {
+                tbody.appendChild(draggedRow);
             }
         });
-        document.addEventListener('dragend', function() {
-            draggedRow = null;
-        });
+
         function getDragAfterElement(container, y) {
-            const rows = [...container.querySelectorAll('tr:not(.dragging)')];
-            return rows.reduce((closest, child) => {
+            return [...container.querySelectorAll('tr:not(.dragging)')].reduce((closest, child) => {
                 const box = child.getBoundingClientRect();
                 const offset = y - box.top - box.height / 2;
-                if (offset < 0 && offset > closest.offset) {
-                    return { offset: offset, element: child };
-                } else {
-                    return closest;
-                }
+                return offset < 0 && offset > closest.offset ? 
+                    { offset: offset, element: child } : closest;
             }, { offset: Number.NEGATIVE_INFINITY }).element;
         }
 
+        // Slit Row Management
         function addSlitRow() {
             const tbody = document.querySelector('#slitTable tbody');
             const newRow = document.createElement('tr');
             newRow.setAttribute('draggable', 'true');
             newRow.innerHTML = `
-                <td class="drag-handle" title="Drag to reorder" aria-label="Drag to reorder">&#9776;</td>
-                <td><input type="number" class="slit-size" aria-label="Slit Size" min="1" required></td>
-                <td><input type="number" class="min-qty" aria-label="Min Quantity" min="0"></td>
-                <td><input type="number" class="max-qty" aria-label="Max Quantity" min="0"></td>
+                <td class="drag-handle" title="Drag to reorder">☰</td>
+                <td><input type="number" class="slit-size" required></td>
+                <td><input type="number" class="min-qty"></td>
+                <td><input type="number" class="max-qty"></td>
                 <td><button class="add-remove-btn" onclick="removeRow(this)">Remove</button></td>
             `;
             tbody.appendChild(newRow);
@@ -144,65 +156,67 @@
             const tbody = document.querySelector('#slitTable tbody');
             tbody.innerHTML = `
                 <tr draggable="true">
-                    <td class="drag-handle" title="Drag to reorder" aria-label="Drag to reorder">&#9776;</td>
-                    <td><input type="number" class="slit-size" aria-label="Slit Size" min="1" required></td>
-                    <td><input type="number" class="min-qty" aria-label="Min Quantity" min="0"></td>
-                    <td><input type="number" class="max-qty" aria-label="Max Quantity" min="0"></td>
+                    <td class="drag-handle" title="Drag to reorder">☰</td>
+                    <td><input type="number" class="slit-size" required></td>
+                    <td><input type="number" class="min-qty"></td>
+                    <td><input type="number" class="max-qty"></td>
                     <td><button class="add-remove-btn" onclick="removeRow(this)">Remove</button></td>
                 </tr>
             `;
         }
 
-        // Input validation and error handling
+        // Input Validation
         function validateInputs() {
-            let valid = true;
-            // Validate main inputs
-            const mainFields = [
+            let isValid = true;
+            const requiredFields = [
                 { id: 'coilWidth', min: 1 },
                 { id: 'totalTrim', min: 0 },
-                { id: 'materialThickness', min: 0.001 },
+                { id: 'materialThickness', min: 0.01 },
                 { id: 'materialDensity', min: 1 }
             ];
-            mainFields.forEach(field => {
+
+            requiredFields.forEach(field => {
                 const el = document.getElementById(field.id);
-                const errorEl = document.getElementById(field.id + 'Error');
-                if (!el.value || parseFloat(el.value) < field.min) {
+                const errorEl = document.getElementById(`${field.id}Error`);
+                const value = parseFloat(el.value);
+
+                if(isNaN(value) || value < field.min) {
                     el.classList.add('error');
-                    errorEl.textContent = 'Invalid value';
-                    valid = false;
+                    errorEl.textContent = `Invalid value (minimum ${field.min})`;
+                    isValid = false;
                 } else {
                     el.classList.remove('error');
                     errorEl.textContent = '';
                 }
             });
-            // Validate slit rows
+
             document.querySelectorAll('#slitTable tbody tr').forEach(row => {
                 const slitSize = row.querySelector('.slit-size');
                 const minQty = row.querySelector('.min-qty');
                 const maxQty = row.querySelector('.max-qty');
-                slitSize.classList.remove('error');
-                minQty.classList.remove('error');
-                maxQty.classList.remove('error');
-                if (!slitSize.value || parseFloat(slitSize.value) < 1) {
+                
+                if(!slitSize.value || parseFloat(slitSize.value) < 1) {
                     slitSize.classList.add('error');
-                    valid = false;
+                    isValid = false;
                 }
-                if (minQty.value && maxQty.value && parseFloat(minQty.value) > parseFloat(maxQty.value)) {
+
+                const minVal = parseFloat(minQty.value) || 0;
+                const maxVal = parseFloat(maxQty.value) || Infinity;
+                
+                if(minVal > maxVal) {
                     minQty.classList.add('error');
                     maxQty.classList.add('error');
-                    valid = false;
+                    isValid = false;
                 }
             });
-            return valid;
+
+            return isValid;
         }
 
-        // Main calculation and results display
+        // Main Calculation Function
         function calculateOptimization() {
-            if (!validateInputs()) {
-                document.getElementById('results').innerHTML = '<span class="error-message">Please correct highlighted errors before calculating.</span>';
-                return;
-            }
-            const coilNo = document.getElementById('coilNo').value.trim();
+            if(!validateInputs()) return;
+
             const coilWidth = parseFloat(document.getElementById('coilWidth').value);
             const totalTrim = parseFloat(document.getElementById('totalTrim').value);
             const availableWidth = coilWidth - totalTrim;
@@ -210,28 +224,16 @@
             const density = parseFloat(document.getElementById('materialDensity').value);
 
             // Collect slit data
-            const slitInputs = Array.from(document.querySelectorAll('.slit-size'));
-            const minQtyInputs = Array.from(document.querySelectorAll('.min-qty'));
-            const maxQtyInputs = Array.from(document.querySelectorAll('.max-qty'));
-
-            const slits = slitInputs.map((input, index) => {
-                const size = parseFloat(input.value) || 0;
-                const minQty = parseFloat(minQtyInputs[index].value) || 0;
-                let maxQty = parseFloat(maxQtyInputs[index].value);
-                if (isNaN(maxQty)) {
-                    maxQty = size > 0 ? Math.floor(availableWidth / size) : 0;
-                }
+            const slits = Array.from(document.querySelectorAll('#slitTable tbody tr')).map(row => {
+                const size = parseFloat(row.querySelector('.slit-size').value);
+                const minQty = parseFloat(row.querySelector('.min-qty').value) || 0;
+                let maxQty = parseFloat(row.querySelector('.max-qty').value);
+                
+                maxQty = isNaN(maxQty) ? Math.floor(availableWidth / size) : maxQty;
                 maxQty = Math.max(minQty, maxQty);
+
                 return { size, minQty, maxQty };
             }).filter(s => s.size > 0);
-
-            // Check minimum requirements
-            const totalMinWidth = slits.reduce((sum, slit) => sum + (slit.minQty * slit.size), 0);
-            if (totalMinWidth > availableWidth) {
-                document.getElementById('results').innerHTML = 
-                    "<span class='error-message'>Error: Minimum requirements exceed available width.</span>";
-                return;
-            }
 
             // Optimization algorithm
             let bestCombination = [];
@@ -239,152 +241,74 @@
             let maxUsed = 0;
 
             function tryCombinations(index = 0, current = [], usedWidth = 0) {
-                if (index === slits.length) {
+                if(index === slits.length) {
                     const waste = availableWidth - usedWidth;
-                    if (waste >= 0 && (waste < minWaste || (waste === minWaste && usedWidth > maxUsed))) {
+                    if(waste >= 0 && (waste < minWaste || (waste === minWaste && usedWidth > maxUsed))) {
                         minWaste = waste;
                         maxUsed = usedWidth;
                         bestCombination = [...current];
                     }
                     return;
                 }
+
                 const slit = slits[index];
-                for (let qty = slit.minQty; qty <= slit.maxQty; qty++) {
+                for(let qty = slit.minQty; qty <= slit.maxQty; qty++) {
                     const newWidth = usedWidth + (qty * slit.size);
-                    if (newWidth <= availableWidth) {
+                    if(newWidth <= availableWidth) {
                         current[index] = qty;
                         tryCombinations(index + 1, current, newWidth);
                     }
                 }
             }
+
             tryCombinations();
 
-            // Calculate percentages
-            const usedWidthPercent = coilWidth > 0 ? ((maxUsed / coilWidth) * 100).toFixed(2) : "0.00";
-            const wastePercent = coilWidth > 0 ? ((minWaste / coilWidth) * 100).toFixed(2) : "0.00";
-            const materialYield = usedWidthPercent;
-            const scrapValue = wastePercent;
-
-            // Calculate weight and length per slit and totals
-            let totalWeight = 0, totalLength = 0;
-            let slitDetails = slits.map((slit, idx) => {
-                const qty = bestCombination[idx] || 0;
-                const width_m = slit.size / 1000;
-                const thickness_m = thickness / 1000;
-                const length_m = qty > 0 ? (1) : 0; // Placeholder for length (if needed)
-                // For flat slitting, length is not defined by width; assume 1m for each slit for demo
-                const weight = width_m * thickness_m * qty * density; // kg per slit (for 1m length)
-                totalWeight += weight;
-                totalLength += qty; // placeholder
-                return {
-                    size: slit.size,
-                    qty: qty,
-                    weight: weight,
-                    // length: length_m
-                };
-            });
-
-            // Show results
+            // Display results
             const resultsDiv = document.getElementById('results');
-            if (bestCombination.length > 0) {
-                let html = `
-                    <h3>Optimal Slitting Combination</h3>
+            if(bestCombination.length > 0) {
+                const usedPercent = ((maxUsed / coilWidth) * 100).toFixed(2);
+                const wastePercent = ((minWaste / coilWidth) * 100).toFixed(2);
+                const totalWeight = (maxUsed * thickness * density) / 1000000;
+
+                resultsDiv.innerHTML = `
+                    <h3>Optimization Results</h3>
                     <table class="summary-table">
-                        <tr>
-                            <th>Coil No.:</th>
-                            <td class="highlight">${coilNo ? coilNo : '-'}</td>
-                        </tr>
-                        <tr>
-                            <th>Original Coil Width:</th>
-                            <td class="highlight">${coilWidth} mm</td>
-                        </tr>
-                        <tr>
-                            <th>Total Trim:</th>
-                            <td>${totalTrim} mm</td>
-                        </tr>
-                        <tr>
-                            <th>Available Width:</th>
-                            <td>${availableWidth} mm</td>
-                        </tr>
-                        <tr>
-                            <th>Used Width:</th>
-                            <td class="highlight">${maxUsed} mm (${usedWidthPercent}%)</td>
-                        </tr>
-                        <tr>
-                            <th>Waste:</th>
-                            <td class="highlight">${minWaste} mm (${wastePercent}%)</td>
-                        </tr>
-                        <tr>
-                            <th>Material Yield:</th>
-                            <td>${materialYield}%</td>
-                        </tr>
-                        <tr>
-                            <th>Scrap Value:</th>
-                            <td>${scrapValue}%</td>
-                        </tr>
-                        <tr>
-                            <th>Total Weight (for 1m length):</th>
-                            <td>${totalWeight.toFixed(2)} kg</td>
-                        </tr>
+                        <tr><th>Used Width:</th><td>${maxUsed}mm (${usedPercent}%)</td></tr>
+                        <tr><th>Waste:</th><td>${minWaste}mm (${wastePercent}%)</td></tr>
+                        <tr><th>Total Weight:</th><td>${totalWeight.toFixed(2)} kg</td></tr>
                     </table>
                     <table class="details-table">
-                        <thead>
-                            <tr>
-                                <th>Slit Size (mm)</th>
-                                <th>Quantity</th>
-                                <th>Weight (kg, 1m length)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-                slitDetails.forEach(detail => {
-                    html += `<tr>
-                        <td>${detail.size}</td>
-                        <td>${detail.qty}</td>
-                        <td>${detail.weight.toFixed(2)}</td>
-                    </tr>`;
-                });
-                html += `
-                        </tbody>
+                        <tr><th>Slit Size</th><th>Quantity</th></tr>
+                        ${slits.map((slit, i) => `
+                            <tr><td>${slit.size}mm</td><td>${bestCombination[i]}</td></tr>
+                        `).join('')}
                     </table>
                 `;
-                resultsDiv.innerHTML = html;
             } else {
-                resultsDiv.innerHTML = "<span class='error-message'>No valid combination found.</span>";
+                resultsDiv.innerHTML = "No valid combination found";
             }
         }
 
         // CSV Export
         function exportToCSV() {
-            let csv = "Slit Size (mm),Quantity,Weight (kg, 1m length)\n";
-            document.querySelectorAll('.details-table tbody tr').forEach(row => {
-                let cols = Array.from(row.children).map(td => td.textContent);
-                csv += cols.join(",") + "\n";
+            const rows = [['Slit Size (mm)', 'Quantity']];
+            document.querySelectorAll('.details-table tr:not(:first-child)').forEach(row => {
+                const cells = Array.from(row.children).map(td => td.textContent);
+                rows.push(cells);
             });
-            let blob = new Blob([csv], { type: "text/csv" });
-            let url = URL.createObjectURL(blob);
-            let a = document.createElement("a");
-            a.href = url;
-            a.download = "slitting_results.csv";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
 
-        // Accessibility: Keyboard navigation for table
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Tab') {
-                const focusable = Array.from(document.querySelectorAll('input, button, [tabindex="0"]'));
-                const index = focusable.indexOf(document.activeElement);
-                if (e.shiftKey && index === 0) {
-                    focusable[focusable.length - 1].focus();
-                    e.preventDefault();
-                } else if (!e.shiftKey && index === focusable.length - 1) {
-                    focusable[0].focus();
-                    e.preventDefault();
-                }
-            }
-        });
+            const csvContent = rows.map(row => 
+                row.join(',')
+            ).join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'slitting_plan.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
     </script>
 </body>
 </html>
