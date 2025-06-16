@@ -58,7 +58,7 @@
       box-sizing: border-box;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-    /* Updated: Style for focused element */
+    /* IMPROVEMENT: Only highlight the active/focused element */
     input[type="number"]:focus, select:focus {
       border-color: #2d7ff9;
       box-shadow: 0 0 0 3px rgba(45, 127, 249, 0.25);
@@ -78,8 +78,13 @@
       border-radius: 8px;
       margin-top: 18px;
       padding: 18px;
+      /* IMPROVEMENT: Subtle fade-in transition */
+      opacity: 0;
+      transition: opacity 0.4s ease;
     }
-    /* New: Styles for results table */
+    .results.visible {
+        opacity: 1;
+    }
     .results-table {
       width: 100%;
       border-collapse: collapse;
@@ -150,15 +155,15 @@
       margin-top: 4px;
       display: none;
     }
-    /* Updated: Invalid state has a red glow */
+    /* IMPROVEMENT: Removed the persistent green border on .valid */
+    input.valid, select.valid {
+      border-color: #ccc; /* Revert to default border color */
+      box-shadow: none;
+    }
+    /* The invalid state remains to provide clear error feedback */
     input.invalid, select.invalid {
       border-color: #e74c3c !important;
       box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.25) !important;
-    }
-    /* Updated: Valid state is just a border color, no glow */
-    input.valid, select.valid {
-      border-color: #27ae60 !important;
-      box-shadow: none;
     }
     .hidden-field {
       display: none !important;
@@ -251,8 +256,8 @@
             </div>
           </div>
         </div>
-        <!-- Updated: Results displayed in a table -->
-        <div class="results" id="weightResults" style="display:none;">
+        <!-- IMPROVEMENT: Added aria-live for accessibility -->
+        <div class="results" id="weightResults" style="display:none;" aria-live="polite">
           <table class="results-table">
             <tbody>
               <tr>
@@ -324,8 +329,8 @@
                 </div>
               </div>
             </div>
-            <!-- Updated: Results displayed in a table -->
-            <div class="results" id="costToSellingResults" style="display:none;">
+            <!-- IMPROVEMENT: Added aria-live for accessibility -->
+            <div class="results" id="costToSellingResults" style="display:none;" aria-live="polite">
               <table class="results-table">
                 <tbody>
                   <tr id="costToSelling_costPerItemRow">
@@ -389,8 +394,8 @@
                 </div>
               </div>
             </div>
-            <!-- Updated: Results displayed in a table -->
-            <div class="results" id="sellingToCostResults" style="display:none;">
+            <!-- IMPROVEMENT: Added aria-live for accessibility -->
+            <div class="results" id="sellingToCostResults" style="display:none;" aria-live="polite">
               <table class="results-table">
                 <tbody>
                   <tr id="sellingToCost_sellingPerItemRow">
@@ -423,13 +428,21 @@
     </form>
   </div>
   <script>
-    // The JavaScript remains unchanged as the element IDs are preserved.
+    // --- IMPROVEMENT: Currency formatting function ---
+    // Formats a number into ZAR currency format (e.g., R 20,000.00)
+    const currencyFormatter = new Intl.NumberFormat('en-ZA', {
+      style: 'currency',
+      currency: 'ZAR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    const formatCurrency = (value) => currencyFormatter.format(value);
+
     // Utility function for rounding
     function round(num, decimals = 2) {
       return parseFloat(num.toFixed(decimals));
     }
-
-    // Elements references
+    // Element references (unchanged from before)
     const shapeSelect = document.getElementById('shapeSelect');
     const widthInput = document.getElementById('width');
     const thicknessInput = document.getElementById('thickness');
@@ -455,14 +468,11 @@
     const cost_weightEach = document.getElementById('cost_weightEach');
     const cost_gp = document.getElementById('cost_gp');
     const costToSellingResults = document.getElementById('costToSellingResults');
-    const costToSelling_costPerItemRow = document.getElementById('costToSelling_costPerItemRow');
-    const costToSelling_costPerTonRow = document.getElementById('costToSelling_costPerTonRow');
     const costToSelling_costPerItem = document.getElementById('costToSelling_costPerItem');
     const costToSelling_costPerTon = document.getElementById('costToSelling_costPerTon');
     const costToSelling_sellingPerItem = document.getElementById('costToSelling_sellingPerItem');
     const costToSelling_sellingPerTon = document.getElementById('costToSelling_sellingPerTon');
     const costToSelling_gpPerItem = document.getElementById('costToSelling_gpPerItem');
-
     const sellModeRadios = document.getElementsByName('sell_mode');
     const sellPerTonCol = document.getElementById('sellPerTonCol');
     const sellPerItemCol = document.getElementById('sellPerItemCol');
@@ -471,15 +481,21 @@
     const sell_weightEach = document.getElementById('sell_weightEach');
     const sell_gp = document.getElementById('sell_gp');
     const sellingToCostResults = document.getElementById('sellingToCostResults');
-    const sellingToCost_sellingPerItemRow = document.getElementById('sellingToCost_sellingPerItemRow');
-    const sellingToCost_sellingPerTonRow = document.getElementById('sellingToCost_sellingPerTonRow');
     const sellingToCost_sellingPerItem = document.getElementById('sellingToCost_sellingPerItem');
     const sellingToCost_sellingPerTon = document.getElementById('sellingToCost_sellingPerTon');
     const sellingToCost_costPerItem = document.getElementById('sellingToCost_costPerItem');
     const sellingToCost_costPerTon = document.getElementById('sellingToCost_costPerTon');
     const sellingToCost_gpPerItem = document.getElementById('sellingToCost_gpPerItem');
-
     const resetBtn = document.getElementById('resetBtn');
+
+    // Show/hide results sections
+    function setResultsVisibility(element, isVisible) {
+        if(isVisible) {
+            element.classList.add('visible');
+        } else {
+            element.classList.remove('visible');
+        }
+    }
 
     // Validation helpers
     function showError(inputId, message) {
@@ -492,7 +508,6 @@
         input.classList.remove('valid');
       }
     }
-
     function clearError(inputId) {
       const input = document.getElementById(inputId);
       const errorSpan = document.getElementById(inputId + 'Error');
@@ -503,9 +518,8 @@
         input.classList.add('valid');
       }
     }
-
     function validateInput(input) {
-      if (!input) return false;
+      if (!input || input.offsetParent === null) return true;
       const val = input.value.trim();
       if (input.hasAttribute('required') && val === '') {
         showError(input.id, 'This field is required');
@@ -529,44 +543,46 @@
       clearError(input.id);
       return true;
     }
-
-    // Validate all visible inputs
     function validateAllInputs() {
       let allValid = true;
-      const inputs = document.querySelectorAll('input, select');
-      inputs.forEach(input => {
-        if (input.offsetParent !== null && !input.disabled && input.getAttribute('tabindex') !== '-1') {
-          if (!validateInput(input)) allValid = false;
+      document.querySelectorAll('input:not([tabindex="-1"]), select').forEach(input => {
+        if (input.offsetParent !== null && !validateInput(input)) {
+            allValid = false;
         }
       });
       return allValid;
     }
     // Calculation functions
     function calcWeight() {
+      if (!validateAllInputs()) {
+        setResultsVisibility(weightResults, false);
+        return null;
+      }
       let width = parseFloat(widthInput.value);
       let thickness = parseFloat(thicknessInput.value);
       let length = parseFloat(lengthInput.value);
       let qty = parseInt(qtyInput.value, 10);
       let density = parseFloat(densityInput.value);
+      let total_tons_input = parseFloat(tonInput.value);
+
+      let kg_per_m = (width / 10 * thickness / 10 * 100) * density / 1000;
+      let weight_each, total_weight, total_meters, total_tons;
 
       if (shapeSelect.value === 'coil' || shapeSelect.value === 'slitcoil') {
-        length = parseFloat(lengthInput.value);
+          total_tons = total_tons_input;
+          total_weight = total_tons * 1000;
+          total_meters = total_weight / kg_per_m;
+          weight_each = total_weight;
+          lengthInput.value = round(total_meters, 3);
+          qtyRow.style.display = 'none';
+      } else {
+          weight_each = kg_per_m * length;
+          total_weight = weight_each * qty;
+          total_meters = length * qty;
+          total_tons = total_weight / 1000;
+          qtyRow.style.display = '';
       }
-
-      if ([width, thickness, length, qty, density].some(v => isNaN(v) || v <= 0)) {
-        weightResults.style.display = 'none';
-        return null;
-      }
-
-      let width_cm = width / 10;
-      let thickness_cm = thickness / 10;
-      let volPerM = width_cm * thickness_cm * 100;
-      let kg_per_m = volPerM * density / 1000;
-      let weight_each = kg_per_m * length;
-      let total_weight = weight_each * qty;
-      let total_meters = length * qty;
-      let total_tons = total_weight / 1000;
-
+      
       cost_weightEach.value = round(weight_each, 4);
       sell_weightEach.value = round(weight_each, 4);
 
@@ -576,194 +592,116 @@
       totalMeters.textContent = round(total_meters, 2) + ' m';
       qtyResult.textContent = qty;
       totalTons.textContent = round(total_tons, 4) + ' t';
-      weightResults.style.display = '';
-      return {
-        kg_per_m,
-        weight_each,
-        total_weight,
-        total_meters,
-        qty,
-        total_tons
-      };
+      
+      setResultsVisibility(weightResults, true);
+      return { weight_each };
     }
-
     function calcCostToSelling() {
+      if (!validateAllInputs()) {
+        setResultsVisibility(costToSellingResults, false);
+        return;
+      }
       let mode = Array.from(costModeRadios).find(r => r.checked).value;
       let cost_per_ton = parseFloat(cost_pricePerTon.value);
       let cost_per_item = parseFloat(cost_pricePerItem.value);
       let weight_each = parseFloat(cost_weightEach.value);
       let gp = parseFloat(cost_gp.value);
 
-      if (isNaN(weight_each) || weight_each <= 0) {
-        costToSellingResults.style.display = 'none';
-        return;
-      }
-
       if (mode === 'ton') {
-        if (isNaN(cost_per_ton) || cost_per_ton <= 0) {
-          costToSellingResults.style.display = 'none';
-          return;
-        }
         cost_per_item = cost_per_ton * weight_each / 1000;
         cost_pricePerItem.value = round(cost_per_item, 2);
       } else {
-        if (isNaN(cost_per_item) || cost_per_item <= 0) {
-          costToSellingResults.style.display = 'none';
-          return;
-        }
         cost_per_ton = cost_per_item / weight_each * 1000;
         cost_pricePerTon.value = round(cost_per_ton, 2);
       }
-
       let selling_per_item = cost_per_item / (1 - gp / 100);
       let selling_per_ton = selling_per_item / weight_each * 1000;
       let gp_per_item = selling_per_item - cost_per_item;
-
-      costToSelling_costPerItem.textContent = 'R ' + round(cost_per_item, 2);
-      costToSelling_costPerTon.textContent = 'R ' + round(cost_per_ton, 2);
-      costToSelling_sellingPerItem.textContent = 'R ' + round(selling_per_item, 2);
-      costToSelling_sellingPerTon.textContent = 'R ' + round(selling_per_ton, 2);
-      costToSelling_gpPerItem.textContent = 'R ' + round(gp_per_item, 2);
-
-      costToSelling_costPerItemRow.style.display = '';
-      costToSelling_costPerTonRow.style.display = '';
-      costToSellingResults.style.display = '';
+      // IMPROVEMENT: Use currency formatting
+      costToSelling_costPerItem.textContent = formatCurrency(cost_per_item);
+      costToSelling_costPerTon.textContent = formatCurrency(cost_per_ton);
+      costToSelling_sellingPerItem.textContent = formatCurrency(selling_per_item);
+      costToSelling_sellingPerTon.textContent = formatCurrency(selling_per_ton);
+      costToSelling_gpPerItem.textContent = formatCurrency(gp_per_item);
+      setResultsVisibility(costToSellingResults, true);
     }
-
     function calcSellingToCost() {
+      if (!validateAllInputs()) {
+        setResultsVisibility(sellingToCostResults, false);
+        return;
+      }
       let mode = Array.from(sellModeRadios).find(r => r.checked).value;
       let selling_per_ton = parseFloat(sell_sellingPerTon.value);
       let selling_per_item = parseFloat(sell_sellingPerItem.value);
       let weight_each = parseFloat(sell_weightEach.value);
       let gp = parseFloat(sell_gp.value);
-      if (isNaN(weight_each) || weight_each <= 0) {
-        sellingToCostResults.style.display = 'none';
-        return;
-      }
 
       if (mode === 'ton') {
-        if (isNaN(selling_per_ton) || selling_per_ton <= 0) {
-          sellingToCostResults.style.display = 'none';
-          return;
-        }
         selling_per_item = selling_per_ton * weight_each / 1000;
         sell_sellingPerItem.value = round(selling_per_item, 2);
       } else {
-        if (isNaN(selling_per_item) || selling_per_item <= 0) {
-          sellingToCostResults.style.display = 'none';
-          return;
-        }
         selling_per_ton = selling_per_item / weight_each * 1000;
         sell_sellingPerTon.value = round(selling_per_ton, 2);
       }
-
       let cost_per_item = selling_per_item * (1 - gp / 100);
       let cost_per_ton = cost_per_item / weight_each * 1000;
       let gp_per_item = selling_per_item - cost_per_item;
-
-      sellingToCost_sellingPerItem.textContent = 'R ' + round(selling_per_item, 2);
-      sellingToCost_sellingPerTon.textContent = 'R ' + round(selling_per_ton, 2);
-      sellingToCost_costPerItem.textContent = 'R ' + round(cost_per_item, 2);
-      sellingToCost_costPerTon.textContent = 'R ' + round(cost_per_ton, 2);
-      sellingToCost_gpPerItem.textContent = 'R ' + round(gp_per_item, 2);
-
-      sellingToCost_sellingPerItemRow.style.display = '';
-      sellingToCost_sellingPerTonRow.style.display = '';
-      sellingToCostResults.style.display = '';
+      // IMPROVEMENT: Use currency formatting
+      sellingToCost_sellingPerItem.textContent = formatCurrency(selling_per_item);
+      sellingToCost_sellingPerTon.textContent = formatCurrency(selling_per_ton);
+      sellingToCost_costPerItem.textContent = formatCurrency(cost_per_item);
+      sellingToCost_costPerTon.textContent = formatCurrency(cost_per_ton);
+      sellingToCost_gpPerItem.textContent = formatCurrency(gp_per_item);
+      setResultsVisibility(sellingToCostResults, true);
     }
-
-    // Update all calculations and validation
+    // Master update function
     function updateAll() {
-      if (!validateAllInputs()) {
-        weightResults.style.display = 'none';
-        costToSellingResults.style.display = 'none';
-        sellingToCostResults.style.display = 'none';
-        return;
-      }
-      const weightObj = calcWeight();
-      if (weightObj) {
+      if (calcWeight()) {
         calcCostToSelling();
         calcSellingToCost();
+      } else {
+        setResultsVisibility(costToSellingResults, false);
+        setResultsVisibility(sellingToCostResults, false);
       }
     }
-
-    // Event listeners for inputs
+    // Event listeners
     const inputsToWatch = [
       shapeSelect, widthInput, thicknessInput, lengthInput, tonInput, densityInput,
       cost_pricePerTon, cost_pricePerItem, cost_gp,
       sell_sellingPerTon, sell_sellingPerItem, sell_gp
     ];
-
     inputsToWatch.forEach(input => {
-      input.addEventListener('input', () => {
-        validateInput(input);
-        updateAll();
-      });
+      input.addEventListener('input', updateAll);
     });
-
-    // Shape select change toggles length/ton inputs
     shapeSelect.addEventListener('change', () => {
-      if (shapeSelect.value === 'coil' || shapeSelect.value === 'slitcoil') {
-        lengthCol.style.display = 'none';
-        tonCol.style.display = '';
-        qtyInput.value = 1;
-      } else {
-        lengthCol.style.display = '';
-        tonCol.style.display = 'none';
-      }
+      const isCoil = shapeSelect.value === 'coil' || shapeSelect.value === 'slitcoil';
+      lengthCol.style.display = isCoil ? 'none' : '';
+      tonCol.style.display = isCoil ? '' : 'none';
+      qtyInput.value = 1;
       updateAll();
     });
-
-    // Radio toggles for cost to selling
-    costModeRadios.forEach(radio => {
-      radio.addEventListener('change', () => {
-        if (radio.checked) {
-          if (radio.value === 'ton') {
-            costPerTonCol.style.display = '';
-            costPerItemCol.style.display = 'none';
-          } else {
-            costPerTonCol.style.display = 'none';
-            costPerItemCol.style.display = '';
-          }
-          updateAll();
-        }
-      });
-    });
-
-    // Radio toggles for selling to cost
-    sellModeRadios.forEach(radio => {
-      radio.addEventListener('change', () => {
-        if (radio.checked) {
-          if (radio.value === 'ton') {
-            sellPerTonCol.style.display = '';
-            sellPerItemCol.style.display = 'none';
-          } else {
-            sellPerTonCol.style.display = 'none';
-            sellPerItemCol.style.display = '';
-          }
-          updateAll();
-        }
-      });
-    });
-
-    // Reset button
+    costModeRadios.forEach(radio => radio.addEventListener('change', () => {
+        costPerTonCol.style.display = radio.value === 'ton' ? '' : 'none';
+        costPerItemCol.style.display = radio.value === 'item' ? '' : 'none';
+        updateAll();
+    }));
+    sellModeRadios.forEach(radio => radio.addEventListener('change', () => {
+        sellPerTonCol.style.display = radio.value === 'ton' ? '' : 'none';
+        sellPerItemCol.style.display = radio.value === 'item' ? '' : 'none';
+        updateAll();
+    }));
     resetBtn.addEventListener('click', () => {
       setTimeout(() => {
-        // Clear validation styles and errors
-        const inputs = document.querySelectorAll('input, select');
-        inputs.forEach(input => {
+        document.querySelectorAll('input, select').forEach(input => {
           input.classList.remove('invalid', 'valid');
           const errorSpan = document.getElementById(input.id + 'Error');
           if (errorSpan) errorSpan.style.display = 'none';
         });
         updateAll();
-      }, 50);
+      }, 0);
     });
-
-    // Initial calculation and validation on page load
-    window.addEventListener('load', () => {
-      updateAll();
-    });
+    // Initial calculation on load
+    window.addEventListener('load', updateAll);
   </script>
 </body>
 </html>
