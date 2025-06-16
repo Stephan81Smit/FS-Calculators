@@ -58,6 +58,12 @@
       box-sizing: border-box;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
+    /* Updated: Style for focused element */
+    input[type="number"]:focus, select:focus {
+      border-color: #2d7ff9;
+      box-shadow: 0 0 0 3px rgba(45, 127, 249, 0.25);
+      outline: none;
+    }
     .row {
       display: flex;
       gap: 16px;
@@ -73,11 +79,29 @@
       margin-top: 18px;
       padding: 18px;
     }
-    .result-item {
-      margin: 8px 0;
+    /* New: Styles for results table */
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
     }
-    .result-label {
+    .results-table td {
+      padding: 10px 5px;
+      border-top: 1px solid #e0e4e8;
+      font-size: 1em;
+      vertical-align: middle;
+    }
+    .results-table tr:first-child td {
+      border-top: none;
+    }
+    .results-table td:first-child {
+      font-weight: 600;
+      color: #495057;
+      width: 65%;
+    }
+    .results-table td:last-child {
+      text-align: right;
       font-weight: 500;
+      color: #2d3e50;
     }
     button {
       display: block;
@@ -97,10 +121,6 @@
     }
     button:hover {
       background: #1b5fc6;
-    }
-    .button-row {
-      display: flex;
-      gap: 16px;
     }
     .dual-section {
       display: flex;
@@ -130,13 +150,15 @@
       margin-top: 4px;
       display: none;
     }
+    /* Updated: Invalid state has a red glow */
     input.invalid, select.invalid {
       border-color: #e74c3c !important;
-      box-shadow: 0 0 5px rgba(231,76,60,0.5);
+      box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.25) !important;
     }
+    /* Updated: Valid state is just a border color, no glow */
     input.valid, select.valid {
       border-color: #27ae60 !important;
-      box-shadow: 0 0 5px rgba(39,174,96,0.5);
+      box-shadow: none;
     }
     .hidden-field {
       display: none !important;
@@ -153,20 +175,6 @@
         min-width: 100%;
         width: 100%;
         margin-bottom: 14px;
-      }
-      input[type="number"], select {
-        font-size: 1em;
-        padding: 16px 8px;
-      }
-      button {
-        font-size: 1em;
-        padding: 16px 0;
-      }
-      h1 {
-        font-size: 1.6em;
-      }
-      h2 {
-        font-size: 1.2em;
       }
     }
     .input-group {
@@ -243,13 +251,36 @@
             </div>
           </div>
         </div>
+        <!-- Updated: Results displayed in a table -->
         <div class="results" id="weightResults" style="display:none;">
-          <div class="result-item"><span class="result-label">Weight per meter:</span> <span id="kgPerM"></span></div>
-          <div class="result-item"><span class="result-label">Weight each:</span> <span id="weightEachKg"></span></div>
-          <div class="result-item"><span class="result-label">Total weight:</span> <span id="totalWeight"></span></div>
-          <div class="result-item"><span class="result-label">Total meters:</span> <span id="totalMeters"></span></div>
-          <div class="result-item" id="qtyRow" style="display:none;"><span class="result-label">Qty:</span> <span id="qtyResult"></span></div>
-          <div class="result-item"><span class="result-label">Total tons:</span> <span id="totalTons"></span></div>
+          <table class="results-table">
+            <tbody>
+              <tr>
+                <td>Weight per meter</td>
+                <td id="kgPerM"></td>
+              </tr>
+              <tr>
+                <td>Weight each</td>
+                <td id="weightEachKg"></td>
+              </tr>
+              <tr>
+                <td>Total weight</td>
+                <td id="totalWeight"></td>
+              </tr>
+              <tr>
+                <td>Total meters</td>
+                <td id="totalMeters"></td>
+              </tr>
+              <tr id="qtyRow" style="display:none;">
+                <td>Qty</td>
+                <td id="qtyResult"></td>
+              </tr>
+              <tr>
+                <td>Total tons</td>
+                <td id="totalTons"></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -293,12 +324,32 @@
                 </div>
               </div>
             </div>
+            <!-- Updated: Results displayed in a table -->
             <div class="results" id="costToSellingResults" style="display:none;">
-              <div class="result-item" id="costToSelling_costPerItemRow"><span class="result-label">Cost per Item:</span> <span id="costToSelling_costPerItem"></span></div>
-              <div class="result-item" id="costToSelling_costPerTonRow"><span class="result-label">Cost per Ton:</span> <span id="costToSelling_costPerTon"></span></div>
-              <div class="result-item"><span class="result-label">Selling Price per Item:</span> <span id="costToSelling_sellingPerItem"></span></div>
-              <div class="result-item"><span class="result-label">Selling Price per Ton:</span> <span id="costToSelling_sellingPerTon"></span></div>
-              <div class="result-item"><span class="result-label">Gross Profit per Item:</span> <span id="costToSelling_gpPerItem"></span></div>
+              <table class="results-table">
+                <tbody>
+                  <tr id="costToSelling_costPerItemRow">
+                    <td>Cost per Item</td>
+                    <td id="costToSelling_costPerItem"></td>
+                  </tr>
+                  <tr id="costToSelling_costPerTonRow">
+                    <td>Cost per Ton</td>
+                    <td id="costToSelling_costPerTon"></td>
+                  </tr>
+                  <tr>
+                    <td>Selling Price per Item</td>
+                    <td id="costToSelling_sellingPerItem"></td>
+                  </tr>
+                  <tr>
+                    <td>Selling Price per Ton</td>
+                    <td id="costToSelling_sellingPerTon"></td>
+                  </tr>
+                  <tr>
+                    <td>Gross Profit per Item</td>
+                    <td id="costToSelling_gpPerItem"></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
@@ -338,12 +389,32 @@
                 </div>
               </div>
             </div>
+            <!-- Updated: Results displayed in a table -->
             <div class="results" id="sellingToCostResults" style="display:none;">
-              <div class="result-item" id="sellingToCost_sellingPerItemRow"><span class="result-label">Selling Price per Item:</span> <span id="sellingToCost_sellingPerItem"></span></div>
-              <div class="result-item" id="sellingToCost_sellingPerTonRow"><span class="result-label">Selling Price per Ton:</span> <span id="sellingToCost_sellingPerTon"></span></div>
-              <div class="result-item"><span class="result-label">Cost per Item:</span> <span id="sellingToCost_costPerItem"></span></div>
-              <div class="result-item"><span class="result-label">Cost per Ton:</span> <span id="sellingToCost_costPerTon"></span></div>
-              <div class="result-item"><span class="result-label">Gross Profit per Item:</span> <span id="sellingToCost_gpPerItem"></span></div>
+              <table class="results-table">
+                <tbody>
+                  <tr id="sellingToCost_sellingPerItemRow">
+                    <td>Selling Price per Item</td>
+                    <td id="sellingToCost_sellingPerItem"></td>
+                  </tr>
+                  <tr id="sellingToCost_sellingPerTonRow">
+                    <td>Selling Price per Ton</td>
+                    <td id="sellingToCost_sellingPerTon"></td>
+                  </tr>
+                  <tr>
+                    <td>Cost per Item</td>
+                    <td id="sellingToCost_costPerItem"></td>
+                  </tr>
+                  <tr>
+                    <td>Cost per Ton</td>
+                    <td id="sellingToCost_costPerTon"></td>
+                  </tr>
+                  <tr>
+                    <td>Gross Profit per Item</td>
+                    <td id="sellingToCost_gpPerItem"></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -352,6 +423,7 @@
     </form>
   </div>
   <script>
+    // The JavaScript remains unchanged as the element IDs are preserved.
     // Utility function for rounding
     function round(num, decimals = 2) {
       return parseFloat(num.toFixed(decimals));
@@ -375,8 +447,6 @@
     const qtyRow = document.getElementById('qtyRow');
     const qtyResult = document.getElementById('qtyResult');
     const totalTons = document.getElementById('totalTons');
-
-    // Pricing Calculator DOM
     const costModeRadios = document.getElementsByName('cost_mode');
     const costPerTonCol = document.getElementById('costPerTonCol');
     const costPerItemCol = document.getElementById('costPerItemCol');
@@ -471,7 +541,6 @@
       });
       return allValid;
     }
-
     // Calculation functions
     function calcWeight() {
       let width = parseFloat(widthInput.value);
@@ -567,7 +636,6 @@
       let selling_per_item = parseFloat(sell_sellingPerItem.value);
       let weight_each = parseFloat(sell_weightEach.value);
       let gp = parseFloat(sell_gp.value);
-
       if (isNaN(weight_each) || weight_each <= 0) {
         sellingToCostResults.style.display = 'none';
         return;
@@ -699,4 +767,3 @@
   </script>
 </body>
 </html>
-
