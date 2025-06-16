@@ -72,7 +72,6 @@
       flex: 1;
       min-width: 140px;
     }
-    /* NEW: Class for a narrower column, used for the shape selector */
     .col-narrow {
       flex: 0 1 300px;
     }
@@ -172,36 +171,28 @@
       position: relative;
       margin-bottom: 12px;
     }
-    /* NEW: Inline style for label and input side-by-side */
-    .input-group.inline {
+    /* CORRECTED: Robust inline style for side-by-side elements */
+    .input-group-inline {
       display: flex;
       align-items: center;
       gap: 12px;
+      margin-bottom: 4px; /* Reduced margin for tight grouping */
     }
-    .input-group.inline label {
+    .input-group-inline label {
       margin: 0;
       white-space: nowrap;
       flex-shrink: 0;
     }
+    /* Wrapper for the inline group + its error message */
+    .field-wrapper {
+        margin-bottom: 12px;
+    }
     @media (max-width: 600px) {
-      .container {
-        padding: 12px;
-      }
-      .row, .button-row, .dual-section {
-        flex-direction: column;
-        gap: 12px;
-      }
-      .col, .col-narrow, .dual-col {
-        min-width: 100%;
-        width: 100%;
-        margin-bottom: 14px;
-        flex-basis: auto;
-      }
-      .input-group.inline {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
-      }
+      .container { padding: 12px; }
+      .row, .dual-section { flex-direction: column; gap: 12px; }
+      .col, .col-narrow, .dual-col { min-width: 100%; width: 100%; flex-basis: auto; }
+      .input-group-inline { flex-direction: column; align-items: flex-start; gap: 6px; }
+      .input-group-inline label { margin-bottom: 0; }
     }
   </style>
 </head>
@@ -217,7 +208,6 @@
       <div class="segment">
         <h2>Product Dimensions</h2>
         <div class="row">
-          <!-- MODIFIED: Added .col-narrow to constrain width -->
           <div class="col col-narrow">
             <div class="input-group">
               <label for="shapeSelect">Product Shape</label>
@@ -232,47 +222,12 @@
           </div>
         </div>
         <div class="row">
-          <div class="col">
-            <div class="input-group">
-              <label for="width">Width (mm)</label>
-              <input type="number" id="width" value="925" min="1" step="0.01" tabindex="2" autofocus required />
-              <span class="error-message" id="widthError"></span>
-            </div>
-          </div>
-          <div class="col">
-            <div class="input-group">
-              <label for="thickness">Thickness (mm)</label>
-              <input type="number" id="thickness" value="0.5" min="0.01" step="0.01" tabindex="3" required />
-              <span class="error-message" id="thicknessError"></span>
-            </div>
-          </div>
-          <div class="col" id="lengthCol">
-            <div class="input-group">
-              <label for="lengthM">Length (meters)</label>
-              <input type="number" id="lengthM" value="1" min="0.001" step="0.001" tabindex="4" required />
-              <span class="error-message" id="lengthMError"></span>
-            </div>
-          </div>
-          <div class="col" id="tonCol" style="display:none;">
-            <div class="input-group">
-              <label for="totalTonInput">Total Weight (tons)</label>
-              <input type="number" id="totalTonInput" value="1" min="0.0001" step="0.0001" tabindex="5" required />
-              <span class="error-message" id="totalTonInputError"></span>
-            </div>
-          </div>
-          <div class="col">
-            <div class="input-group">
-              <label for="quantity">Qty</label>
-              <input type="number" id="quantity" value="1" min="1" step="1" tabindex="6" readonly />
-            </div>
-          </div>
-          <div class="col">
-            <div class="input-group">
-              <label for="density">Density (g/cm³)</label>
-              <input type="number" id="density" value="8.039" min="6" max="9" step="0.001" tabindex="7" required />
-              <span class="error-message" id="densityError"></span>
-            </div>
-          </div>
+          <div class="col"><div class="input-group"><label for="width">Width (mm)</label><input type="number" id="width" value="925" min="1" step="0.01" tabindex="2" autofocus required /><span class="error-message" id="widthError"></span></div></div>
+          <div class="col"><div class="input-group"><label for="thickness">Thickness (mm)</label><input type="number" id="thickness" value="0.5" min="0.01" step="0.01" tabindex="3" required /><span class="error-message" id="thicknessError"></span></div></div>
+          <div class="col" id="lengthCol"><div class="input-group"><label for="lengthM">Length (meters)</label><input type="number" id="lengthM" value="1" min="0.001" step="0.001" tabindex="4" required /><span class="error-message" id="lengthMError"></span></div></div>
+          <div class="col" id="tonCol" style="display:none;"><div class="input-group"><label for="totalTonInput">Total Weight (tons)</label><input type="number" id="totalTonInput" value="1" min="0.0001" step="0.0001" tabindex="5" required /><span class="error-message" id="totalTonInputError"></span></div></div>
+          <div class="col"><div class="input-group"><label for="quantity">Qty</label><input type="number" id="quantity" value="1" min="1" step="1" tabindex="6" readonly /></div></div>
+          <div class="col"><div class="input-group"><label for="density">Density (g/cm³)</label><input type="number" id="density" value="8.039" min="6" max="9" step="0.001" tabindex="7" required /><span class="error-message" id="densityError"></span></div></div>
         </div>
         <div class="results" id="weightResults" aria-live="polite">
           <table class="results-table">
@@ -299,37 +254,40 @@
               <label><input type="radio" name="cost_mode" value="ton" checked tabindex="8" /> Enter Cost (R/ton)</label>
               <label><input type="radio" name="cost_mode" value="item" tabindex="9" /> Enter Cost (each)</label>
             </div>
-            <div id="costPerTonCol">
-              <!-- MODIFIED: Added .inline class for side-by-side layout -->
-              <div class="input-group inline">
+            
+            <!-- CORRECTED HTML STRUCTURE -->
+            <div id="costPerTonCol" class="field-wrapper">
+              <div class="input-group-inline">
                 <label for="cost_pricePerTon">Cost Price (R/ton)</label>
                 <input type="number" id="cost_pricePerTon" value="20000" min="0.01" step="0.01" tabindex="10" required />
               </div>
               <span class="error-message" id="cost_pricePerTonError"></span>
             </div>
-            <div id="costPerItemCol" style="display:none;">
-              <!-- MODIFIED: Added .inline class for side-by-side layout -->
-              <div class="input-group inline">
+            <div id="costPerItemCol" class="field-wrapper" style="display:none;">
+              <div class="input-group-inline">
                 <label for="cost_pricePerItem">Cost Price (R/item)</label>
                 <input type="number" id="cost_pricePerItem" value="93.32" min="0.01" step="0.01" tabindex="11" required />
               </div>
               <span class="error-message" id="cost_pricePerItemError"></span>
             </div>
+            <div class="field-wrapper">
+              <div class="input-group-inline">
+                <label for="cost_gp">GP %</label>
+                <input type="number" id="cost_gp" value="25" min="0" max="99.99" step="0.1" tabindex="12" required />
+              </div>
+              <span class="error-message" id="cost_gpError"></span>
+            </div>
+            
             <div class="input-group hidden-field">
               <label for="cost_weightEach">Weight per Item (kg)</label>
               <input type="number" id="cost_weightEach" value="4.66" min="0.01" step="0.01" tabindex="-1" />
             </div>
-            <!-- MODIFIED: Added .inline class for side-by-side layout -->
-            <div class="input-group inline">
-              <label for="cost_gp">GP %</label>
-              <input type="number" id="cost_gp" value="25" min="0" max="99.99" step="0.1" tabindex="12" required />
-            </div>
-            <span class="error-message" id="cost_gpError"></span>
+
             <div class="results" id="costToSellingResults" aria-live="polite">
               <table class="results-table">
                 <tbody>
-                  <tr id="costToSelling_costPerItemRow"><td>Cost per Item</td><td id="costToSelling_costPerItem"></td></tr>
-                  <tr id="costToSelling_costPerTonRow"><td>Cost per Ton</td><td id="costToSelling_costPerTon"></td></tr>
+                  <tr><td>Cost per Item</td><td id="costToSelling_costPerItem"></td></tr>
+                  <tr><td>Cost per Ton</td><td id="costToSelling_costPerTon"></td></tr>
                   <tr><td>Selling Price per Item</td><td id="costToSelling_sellingPerItem"></td></tr>
                   <tr><td>Selling Price per Ton</td><td id="costToSelling_sellingPerTon"></td></tr>
                   <tr><td>Gross Profit per Item</td><td id="costToSelling_gpPerItem"></td></tr>
@@ -345,37 +303,40 @@
               <label><input type="radio" name="sell_mode" value="ton" checked tabindex="13" /> Enter Selling (R/ton)</label>
               <label><input type="radio" name="sell_mode" value="item" tabindex="14" /> Enter Selling (each)</label>
             </div>
-            <div id="sellPerTonCol">
-              <!-- MODIFIED: Added .inline class for side-by-side layout -->
-              <div class="input-group inline">
+
+            <!-- CORRECTED HTML STRUCTURE -->
+            <div id="sellPerTonCol" class="field-wrapper">
+              <div class="input-group-inline">
                 <label for="sell_sellingPerTon">Selling Price (R/ton)</label>
                 <input type="number" id="sell_sellingPerTon" value="26667" min="0.01" step="0.01" tabindex="15" required />
               </div>
               <span class="error-message" id="sell_sellingPerTonError"></span>
             </div>
-            <div id="sellPerItemCol" style="display:none;">
-              <!-- MODIFIED: Added .inline class for side-by-side layout -->
-              <div class="input-group inline">
+            <div id="sellPerItemCol" class="field-wrapper" style="display:none;">
+              <div class="input-group-inline">
                 <label for="sell_sellingPerItem">Selling Price (R/item)</label>
                 <input type="number" id="sell_sellingPerItem" value="124.43" min="0.01" step="0.01" tabindex="16" required />
               </div>
               <span class="error-message" id="sell_sellingPerItemError"></span>
             </div>
+            <div class="field-wrapper">
+              <div class="input-group-inline">
+                <label for="sell_gp">GP %</label>
+                <input type="number" id="sell_gp" value="25" min="0" max="99.99" step="0.1" tabindex="17" required />
+              </div>
+              <span class="error-message" id="sell_gpError"></span>
+            </div>
+
             <div class="input-group hidden-field">
               <label for="sell_weightEach">Weight per Item (kg)</label>
               <input type="number" id="sell_weightEach" value="4.66" min="0.01" step="0.01" tabindex="-1" />
             </div>
-            <!-- MODIFIED: Added .inline class for side-by-side layout -->
-            <div class="input-group inline">
-              <label for="sell_gp">GP %</label>
-              <input type="number" id="sell_gp" value="25" min="0" max="99.99" step="0.1" tabindex="17" required />
-            </div>
-            <span class="error-message" id="sell_gpError"></span>
+
             <div class="results" id="sellingToCostResults" aria-live="polite">
               <table class="results-table">
                 <tbody>
-                  <tr id="sellingToCost_sellingPerItemRow"><td>Selling Price per Item</td><td id="sellingToCost_sellingPerItem"></td></tr>
-                  <tr id="sellingToCost_sellingPerTonRow"><td>Selling Price per Ton</td><td id="sellingToCost_sellingPerTon"></td></tr>
+                  <tr><td>Selling Price per Item</td><td id="sellingToCost_sellingPerItem"></td></tr>
+                  <tr><td>Selling Price per Ton</td><td id="sellingToCost_sellingPerTon"></td></tr>
                   <tr><td>Cost per Item</td><td id="sellingToCost_costPerItem"></td></tr>
                   <tr><td>Cost per Ton</td><td id="sellingToCost_costPerTon"></td></tr>
                   <tr><td>Gross Profit per Item</td><td id="sellingToCost_gpPerItem"></td></tr>
@@ -389,7 +350,7 @@
     </form>
   </div>
   <script>
-    // The JavaScript remains unchanged as it is not affected by these layout changes.
+    // JavaScript is now fully functional with the corrected HTML
     const currencyFormatter = new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR' });
     const formatCurrency = (value) => currencyFormatter.format(value);
     function round(num, decimals = 2) { return parseFloat(num.toFixed(decimals)); }
@@ -438,29 +399,20 @@
     const sellingToCost_gpPerItem = document.getElementById('sellingToCost_gpPerItem');
     const resetBtn = document.getElementById('resetBtn');
 
-    function setResultsVisibility(element, isVisible) {
-        element.classList.toggle('visible', isVisible);
-    }
+    function setResultsVisibility(element, isVisible) { element.classList.toggle('visible', isVisible); }
     function showError(inputId, message) {
-      const input = document.getElementById(inputId);
-      const errorSpan = document.getElementById(inputId + 'Error');
-      if (errorSpan) {
-        errorSpan.textContent = message; errorSpan.style.display = 'block';
-        input.classList.add('invalid'); input.classList.remove('valid');
-      }
+      const input = document.getElementById(inputId); const errorSpan = document.getElementById(inputId + 'Error');
+      if (errorSpan) { errorSpan.textContent = message; errorSpan.style.display = 'block'; }
+      if (input) { input.classList.add('invalid'); input.classList.remove('valid'); }
     }
     function clearError(inputId) {
-      const input = document.getElementById(inputId);
-      const errorSpan = document.getElementById(inputId + 'Error');
-      if (errorSpan) {
-        errorSpan.textContent = ''; errorSpan.style.display = 'none';
-        input.classList.remove('invalid'); input.classList.add('valid');
-      }
+      const input = document.getElementById(inputId); const errorSpan = document.getElementById(inputId + 'Error');
+      if (errorSpan) { errorSpan.textContent = ''; errorSpan.style.display = 'none'; }
+      if (input) { input.classList.remove('invalid'); input.classList.add('valid'); }
     }
     function validateInput(input) {
       if (!input || input.offsetParent === null) return true;
-      const val = input.value.trim();
-      const id = input.id;
+      const val = input.value.trim(); const id = input.id;
       if (input.hasAttribute('required') && val === '') { showError(id, 'This field is required'); return false; }
       if (input.type === 'number') {
         const numVal = parseFloat(val);
@@ -479,91 +431,54 @@
     }
     function calcWeight() {
       if (!validateAllInputs()) { setResultsVisibility(weightResults, false); return null; }
-      let width = parseFloat(widthInput.value), thickness = parseFloat(thicknessInput.value),
-          length = parseFloat(lengthInput.value), qty = parseInt(qtyInput.value, 10),
-          density = parseFloat(densityInput.value), total_tons_input = parseFloat(tonInput.value);
+      let width = parseFloat(widthInput.value), thickness = parseFloat(thicknessInput.value), length = parseFloat(lengthInput.value), qty = parseInt(qtyInput.value, 10), density = parseFloat(densityInput.value), total_tons_input = parseFloat(tonInput.value);
       let kg_per_m = (width / 10 * thickness / 10 * 100) * density / 1000;
       let weight_each, total_weight, total_meters, total_tons;
       if (shapeSelect.value === 'coil' || shapeSelect.value === 'slitcoil') {
-          total_tons = total_tons_input; total_weight = total_tons * 1000;
-          total_meters = total_weight / kg_per_m; weight_each = total_weight;
+          total_tons = total_tons_input; total_weight = total_tons * 1000; total_meters = total_weight / kg_per_m; weight_each = total_weight;
           lengthInput.value = round(total_meters, 3); qtyRow.style.display = 'none';
       } else {
-          weight_each = kg_per_m * length; total_weight = weight_each * qty;
-          total_meters = length * qty; total_tons = total_weight / 1000;
-          qtyRow.style.display = '';
+          weight_each = kg_per_m * length; total_weight = weight_each * qty; total_meters = length * qty; total_tons = total_weight / 1000; qtyRow.style.display = '';
       }
       cost_weightEach.value = round(weight_each, 4); sell_weightEach.value = round(weight_each, 4);
-      kgPerM.textContent = round(kg_per_m, 4) + ' kg'; weightEachKg.textContent = round(weight_each, 4) + ' kg';
-      totalWeight.textContent = round(total_weight, 2) + ' kg'; totalMeters.textContent = round(total_meters, 2) + ' m';
-      qtyResult.textContent = qty; totalTons.textContent = round(total_tons, 4) + ' t';
+      kgPerM.textContent = round(kg_per_m, 4) + ' kg'; weightEachKg.textContent = round(weight_each, 4) + ' kg'; totalWeight.textContent = round(total_weight, 2) + ' kg'; totalMeters.textContent = round(total_meters, 2) + ' m'; qtyResult.textContent = qty; totalTons.textContent = round(total_tons, 4) + ' t';
       setResultsVisibility(weightResults, true); return { weight_each };
     }
     function calcCostToSelling() {
       if (!validateAllInputs()) { setResultsVisibility(costToSellingResults, false); return; }
-      let mode = Array.from(costModeRadios).find(r => r.checked).value,
-          cost_per_ton = parseFloat(cost_pricePerTon.value), cost_per_item = parseFloat(cost_pricePerItem.value),
-          weight_each = parseFloat(cost_weightEach.value), gp = parseFloat(cost_gp.value);
-      if (mode === 'ton') {
-        cost_per_item = cost_per_ton * weight_each / 1000; cost_pricePerItem.value = round(cost_per_item, 2);
-      } else {
-        cost_per_ton = cost_per_item / weight_each * 1000; cost_pricePerTon.value = round(cost_per_ton, 2);
-      }
-      let selling_per_item = cost_per_item / (1 - gp / 100),
-          selling_per_ton = selling_per_item / weight_each * 1000,
-          gp_per_item = selling_per_item - cost_per_item;
-      costToSelling_costPerItem.textContent = formatCurrency(cost_per_item);
-      costToSelling_costPerTon.textContent = formatCurrency(cost_per_ton);
-      costToSelling_sellingPerItem.textContent = formatCurrency(selling_per_item);
-      costToSelling_sellingPerTon.textContent = formatCurrency(selling_per_ton);
-      costToSelling_gpPerItem.textContent = formatCurrency(gp_per_item);
+      let mode = Array.from(costModeRadios).find(r => r.checked).value, cost_per_ton = parseFloat(cost_pricePerTon.value), cost_per_item = parseFloat(cost_pricePerItem.value), weight_each = parseFloat(cost_weightEach.value), gp = parseFloat(cost_gp.value);
+      if (mode === 'ton') { cost_per_item = cost_per_ton * weight_each / 1000; cost_pricePerItem.value = round(cost_per_item, 2); } else { cost_per_ton = cost_per_item / weight_each * 1000; cost_pricePerTon.value = round(cost_per_ton, 2); }
+      let selling_per_item = cost_per_item / (1 - gp / 100), selling_per_ton = selling_per_item / weight_each * 1000, gp_per_item = selling_per_item - cost_per_item;
+      costToSelling_costPerItem.textContent = formatCurrency(cost_per_item); costToSelling_costPerTon.textContent = formatCurrency(cost_per_ton); costToSelling_sellingPerItem.textContent = formatCurrency(selling_per_item); costToSelling_sellingPerTon.textContent = formatCurrency(selling_per_ton); costToSelling_gpPerItem.textContent = formatCurrency(gp_per_item);
       setResultsVisibility(costToSellingResults, true);
     }
     function calcSellingToCost() {
       if (!validateAllInputs()) { setResultsVisibility(sellingToCostResults, false); return; }
-      let mode = Array.from(sellModeRadios).find(r => r.checked).value,
-          selling_per_ton = parseFloat(sell_sellingPerTon.value), selling_per_item = parseFloat(sell_sellingPerItem.value),
-          weight_each = parseFloat(sell_weightEach.value), gp = parseFloat(sell_gp.value);
-      if (mode === 'ton') {
-        selling_per_item = selling_per_ton * weight_each / 1000; sell_sellingPerItem.value = round(selling_per_item, 2);
-      } else {
-        selling_per_ton = selling_per_item / weight_each * 1000; sell_sellingPerTon.value = round(selling_per_ton, 2);
-      }
-      let cost_per_item = selling_per_item * (1 - gp / 100),
-          cost_per_ton = cost_per_item / weight_each * 1000,
-          gp_per_item = selling_per_item - cost_per_item;
-      sellingToCost_sellingPerItem.textContent = formatCurrency(selling_per_item);
-      sellingToCost_sellingPerTon.textContent = formatCurrency(selling_per_ton);
-      sellingToCost_costPerItem.textContent = formatCurrency(cost_per_item);
-      sellingToCost_costPerTon.textContent = formatCurrency(cost_per_ton);
-      sellingToCost_gpPerItem.textContent = formatCurrency(gp_per_item);
+      let mode = Array.from(sellModeRadios).find(r => r.checked).value, selling_per_ton = parseFloat(sell_sellingPerTon.value), selling_per_item = parseFloat(sell_sellingPerItem.value), weight_each = parseFloat(sell_weightEach.value), gp = parseFloat(sell_gp.value);
+      if (mode === 'ton') { selling_per_item = selling_per_ton * weight_each / 1000; sell_sellingPerItem.value = round(selling_per_item, 2); } else { selling_per_ton = selling_per_item / weight_each * 1000; sell_sellingPerTon.value = round(selling_per_ton, 2); }
+      let cost_per_item = selling_per_item * (1 - gp / 100), cost_per_ton = cost_per_item / weight_each * 1000, gp_per_item = selling_per_item - cost_per_item;
+      sellingToCost_sellingPerItem.textContent = formatCurrency(selling_per_item); sellingToCost_sellingPerTon.textContent = formatCurrency(selling_per_ton); sellingToCost_costPerItem.textContent = formatCurrency(cost_per_item); sellingToCost_costPerTon.textContent = formatCurrency(cost_per_ton); sellingToCost_gpPerItem.textContent = formatCurrency(gp_per_item);
       setResultsVisibility(sellingToCostResults, true);
     }
     function updateAll() {
-      if (calcWeight()) { calcCostToSelling(); calcSellingToCost(); }
-      else { setResultsVisibility(costToSellingResults, false); setResultsVisibility(sellingToCostResults, false); }
+      if (calcWeight()) { calcCostToSelling(); calcSellingToCost(); } else { setResultsVisibility(costToSellingResults, false); setResultsVisibility(sellingToCostResults, false); }
     }
-    const inputsToWatch = [shapeSelect, widthInput, thicknessInput, lengthInput, tonInput, densityInput,
-      cost_pricePerTon, cost_pricePerItem, cost_gp, sell_sellingPerTon, sell_sellingPerItem, sell_gp];
+    const inputsToWatch = [shapeSelect, widthInput, thicknessInput, lengthInput, tonInput, densityInput, cost_pricePerTon, cost_pricePerItem, cost_gp, sell_sellingPerTon, sell_sellingPerItem, sell_gp];
     inputsToWatch.forEach(input => input.addEventListener('input', updateAll));
     shapeSelect.addEventListener('change', () => {
       const isCoil = shapeSelect.value === 'coil' || shapeSelect.value === 'slitcoil';
-      lengthCol.style.display = isCoil ? 'none' : ''; tonCol.style.display = isCoil ? '' : 'none';
-      qtyInput.value = 1; updateAll();
+      lengthCol.style.display = isCoil ? 'none' : ''; tonCol.style.display = isCoil ? '' : 'none'; qtyInput.value = 1; updateAll();
     });
     costModeRadios.forEach(radio => radio.addEventListener('change', () => {
-      costPerTonCol.style.display = radio.value === 'ton' ? '' : 'none';
-      costPerItemCol.style.display = radio.value === 'item' ? '' : 'none'; updateAll();
+      costPerTonCol.style.display = radio.value === 'ton' ? '' : 'none'; costPerItemCol.style.display = radio.value === 'item' ? '' : 'none'; updateAll();
     }));
     sellModeRadios.forEach(radio => radio.addEventListener('change', () => {
-      sellPerTonCol.style.display = radio.value === 'ton' ? '' : 'none';
-      sellPerItemCol.style.display = radio.value === 'item' ? '' : 'none'; updateAll();
+      sellPerTonCol.style.display = radio.value === 'ton' ? '' : 'none'; sellPerItemCol.style.display = radio.value === 'item' ? '' : 'none'; updateAll();
     }));
     resetBtn.addEventListener('click', () => {
       setTimeout(() => {
         document.querySelectorAll('.invalid, .valid').forEach(el => el.classList.remove('invalid', 'valid'));
-        document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
-        updateAll();
+        document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none'); updateAll();
       }, 0);
     });
     window.addEventListener('load', updateAll);
